@@ -1,25 +1,25 @@
 ---
-title: Message configuration
+title: 消息配置
 sidebar_position: 3
-description: Configure email message fields including from, to, subject, text, html, and attachments.
+description: 配置电子邮件消息字段，包括发件人、收件人、主题、文本、HTML 和附件。
 ---
 
-This page describes all available fields you can use when composing an email message with Nodemailer. Most emails only need a few basic fields, but advanced options are available when you need more control.
+本页面描述了使用 Nodemailer 编写电子邮件时可用的所有字段。大多数电子邮件只需几个基本字段，但当你需要更多控制时，也提供了高级选项。
 
-### Common fields
+### 常用字段
 
-These are the fields you will use most often when sending emails:
+发送电子邮件时你最常使用的字段有：
 
-- **from** - The email address of the sender. You can use a plain address like `'sender@server.com'` or include a display name like `'"Sender Name" <sender@server.com>'`. See [Address object](/message/addresses) for more formatting options.
-- **to** - The recipients who will appear in the _To:_ field. Accepts a comma-separated string or an array of addresses.
-- **cc** - The recipients who will appear in the _Cc:_ (carbon copy) field. Accepts a comma-separated string or an array of addresses.
-- **bcc** - The recipients who will appear in the _Bcc:_ (blind carbon copy) field. These recipients receive the email but are hidden from other recipients. Accepts a comma-separated string or an array of addresses.
-- **subject** - The subject line of the email.
-- **text** - The plaintext version of the message body. Can be a string, Buffer, Stream, or an attachment-like object (for example, `{path: '/var/data/message.txt'}`).
-- **html** - The HTML version of the message body. Can be a string, Buffer, Stream, or an attachment-like object (for example, `{path: 'http://example.com/email.html'}`).
-- **attachments** - An array of attachment objects. See [Using attachments](/message/attachments) for details. You can also use attachments for [embedding images](/message/embedded-images) in your HTML content.
+- **from** - 发件人的电子邮件地址。你可以使用简单地址，如 `'sender@server.com'`，也可以包含显示名称，如 `'"Sender Name" <sender@server.com>'`。更多格式选项见[地址对象](/message/addresses)。
+- **to** - 显示在 _收件人（To）_ 字段中的收件人。接受逗号分隔的字符串或地址数组。
+- **cc** - 显示在 _抄送（Cc）_ 字段中的收件人。接受逗号分隔的字符串或地址数组。
+- **bcc** - 显示在 _密送（Bcc）_ 字段中的收件人。密送的收件人会收到邮件，但其他收件人看不到他们。接受逗号分隔的字符串或地址数组。
+- **subject** - 邮件主题行。
+- **text** - 邮件正文的纯文本版本。可以是字符串、Buffer、流或类似附件的对象（例如 `{path: '/var/data/message.txt'}`）。
+- **html** - 邮件正文的 HTML 版本。可以是字符串、Buffer、流或类似附件的对象（例如 `{path: 'http://example.com/email.html'}`）。
+- **attachments** - 附件对象的数组。详见[使用附件](/message/attachments)。你也可以用附件实现[嵌入图像](/message/embedded-images)于 HTML 内容中。
 
-The following example shows a typical email using only the basic fields:
+以下示例展示了仅使用基础字段的典型邮件：
 
 ```javascript
 const message = {
@@ -31,63 +31,63 @@ const message = {
 };
 ```
 
-### More advanced fields
+### 更多高级字段
 
-The following sections cover additional options for fine-tuning your email messages.
+以下章节涵盖了微调邮件的附加选项。
 
-##### Routing options
+##### 路由选项
 
-These options control how the email is addressed and how replies are handled:
+这些选项控制邮件的地址及回复处理方式：
 
-- **sender** - An email address that will appear in the _Sender:_ field. This is typically used when the actual sender differs from the address in the _From:_ field (for example, when sending on behalf of someone else). In most cases, you should use **from** instead.
-- **replyTo** - An email address that will appear in the _Reply-To:_ field. When recipients reply to your email, their response will be sent to this address instead of the _From:_ address.
-- **inReplyTo** - The Message-ID of the email this message is replying to. This helps email clients thread conversations together.
-- **references** - A list of Message-IDs that this email references. Can be an array of strings or a space-separated string. Used for threading related messages together.
-- **envelope** - A custom SMTP envelope, if the automatically generated envelope is not suitable for your needs. See [SMTP envelope](/smtp/envelope) for details.
-- **requireTLSExtensionEnabled** - When set to `true`, the SMTP `REQUIRETLS` extension (RFC 8689) is used. This ensures TLS encryption is required for the entire delivery chain, not just the first hop. The connection must already be using TLS, and the server must advertise REQUIRETLS support. Can also be set inside the [envelope](/smtp/envelope) object.
+- **sender** - 出现在 _发件人（Sender）_ 字段的电子邮件地址。通常用于实际发件人与 _From:_ 字段不同的情况（例如代表他人发送时）。大多数情况下，应使用 **from**。
+- **replyTo** - 出现在 _回复至（Reply-To）_ 字段的电子邮件地址。收件人回复你的邮件时，回复会发送到此地址而非 _From:_。
+- **inReplyTo** - 此邮件所回复邮件的 Message-ID，帮助邮件客户端建立会话线程。
+- **references** - 此邮件引用的 Message-ID 列表。可为字符串数组或空格分隔的字符串。用于将相关邮件线程组织在一起。
+- **envelope** - 自定义 SMTP 信封，若自动生成的信封不满足需求。详见[SMTP 信封](/smtp/envelope)。
+- **requireTLSExtensionEnabled** - 设置为 `true` 时，SMTP 的 `REQUIRETLS` 扩展（RFC 8689）会生效。确保整个传输链路都使用 TLS 加密，而不仅是第一跳。连接必须已经使用 TLS，且服务器需支持 REQUIRETLS。也可以在 [envelope](/smtp/envelope) 对象内设置。
 
-##### Content options
+##### 内容选项
 
-These options provide additional ways to control the message content:
+这些选项为控制邮件内容提供附加方式：
 
-- **attachDataUrls** - When set to `true`, Nodemailer automatically converts `data:` URI images in your HTML content into embedded attachments. This is useful when your HTML contains inline images encoded as data URIs.
-- **watchHtml** - An Apple Watch-specific HTML version of the message. Note that modern Apple Watches render standard `text/html` content well, so this field is rarely needed.
-- **amp** - An AMP4EMAIL-specific HTML version of the message. Works the same way as `text` and `html`. See the [AMP example below](#amp-example) for usage, or read [this blog post](https://blog.nodemailer.com/2019/12/30/testing-amp4email-with-nodemailer/) for more details about sending and rendering AMP emails.
-- **icalEvent** - An iCalendar event to include as an alternative content type. This is useful for sending calendar invitations. See [Calendar events](/message/calendar-events) for details.
-- **alternatives** - An array of alternative content representations (in addition to the text and HTML parts). See [Using alternative content](/message/alternatives) for details.
-- **encoding** - Sets the `Content-Transfer-Encoding` header for text and HTML parts. When specified, this value is used directly as the transfer encoding (e.g., `'base64'`, `'quoted-printable'`, `'7bit'`, `'8bit'`). This is different from `textEncoding`, which controls how text content is automatically encoded.
-- **raw** - An existing MIME message to send instead of generating a new one. Use this when you have a pre-built email message. See [Custom source](/message/custom-source) for details.
-- **textEncoding** - Forces a specific content-transfer-encoding for text content. Valid values are `'quoted-printable'` or `'base64'`. By default, Nodemailer automatically chooses the best option: `quoted-printable` for content with mostly ASCII characters, and `base64` otherwise.
+- **attachDataUrls** - 设置为 `true` 时，Nodemailer 会自动将 HTML 内容中的 `data:` URI 图片转为嵌入附件。当 HTML 含有内联编码的 data URI 图片时很有用。
+- **watchHtml** - Apple Watch 专用的 HTML 内容版本。现代 Apple Watch 已可良好渲染标准的 `text/html`，因此此字段较少使用。
+- **amp** - AMP4EMAIL 专用的 HTML 邮件版本。用法与 `text` 和 `html` 类似。见下方的[AMP 示例](#amp-example)或阅读[本博客文章](https://blog.nodemailer.com/2019/12/30/testing-amp4email-with-nodemailer/)了解 AMP 邮件的发送和渲染。
+- **icalEvent** - 作为替代内容类型包含的 iCalendar 事件。用于发送日历邀请。详见[日历事件](/message/calendar-events)。
+- **alternatives** - 备选内容表示的数组（除了文本和 HTML 部分）。详见[使用替代内容](/message/alternatives)。
+- **encoding** - 设置文本和 HTML 部分的 `Content-Transfer-Encoding` 头。指定时，直接使用该转码方式（例如 `'base64'`、`'quoted-printable'`、`'7bit'`、`'8bit'`）。此项不同于 `textEncoding`，后者控制文本内容如何自动编码。
+- **raw** - 发送预先构造好的完整 MIME 消息，而非自动生成。适用于已有完整邮件消息时。详见[自定义源](/message/custom-source)。
+- **textEncoding** - 强制文本内容采用特定的内容传输编码。有效值为 `'quoted-printable'` 或 `'base64'`。默认情况下，Nodemailer 会自动选取最佳方案：大部分为 ASCII 时用 `quoted-printable`，否则用 `base64`。
 
-##### Header options
+##### 头部选项
 
-These options let you customize the email headers:
+这些选项让你定制邮件头：
 
-- **priority** - Sets the message importance level. Valid values are `'high'`, `'normal'` (the default), or `'low'`. This adds the appropriate `X-Priority`, `X-MSMail-Priority`, and `Importance` headers to your message.
-- **headers** - Custom header fields to add to the message. Can be an object like `{"X-Key-Name": "key value"}` or an array for multiple values with the same key: `[{key: "X-Key-Name", value: "val1"}, {key: "X-Key-Name", value: "val2"}]`. See [Custom headers](/message/custom-headers) for more details.
-- **messageId** - A custom Message-ID value for the email. If not provided, Nodemailer generates a random unique identifier automatically.
-- **date** - The date to use for the email's Date header. If not provided, the current date and time (in UTC) is used. You can pass a Date object or a date string.
-- **list** - A helper object for setting List-\* headers, commonly used for mailing list messages. See [List headers](/message/list-headers) for more details.
+- **priority** - 设定邮件优先级。可用值为 `'high'`、`'normal'`（默认）或 `'low'`。会自动添加对应的 `X-Priority`、`X-MSMail-Priority` 和 `Importance` 头。
+- **headers** - 自定义邮件头字段。可为对象如 `{ "X-Key-Name": "key value" }`，或数组用于同一键的多值：`[{key: "X-Key-Name", value: "val1"}, {key: "X-Key-Name", value: "val2"}]`。详见[自定义头部](/message/custom-headers)。
+- **messageId** - 邮件的自定义 Message-ID。未指定则 Nodemailer 自动生成唯一标识。
+- **date** - 邮件 `Date` 头使用的日期。未指定则使用当前日期（UTC）。可以传入 Date 对象或日期字符串。
+- **list** - 设置 List-* 邮件头的辅助对象，通常用于邮件列表。详见[List 头部](/message/list-headers)。
 
-##### Security options
+##### 安全选项
 
-These options help protect your application when processing email data from untrusted sources:
+这些选项帮助保护应用在处理不受信任邮件数据时的安全：
 
-- **disableFileAccess** - When set to `true`, prevents Nodemailer from reading files from the filesystem. Use this option when constructing emails from untrusted JSON data to prevent attackers from reading arbitrary files. If an attachment or message node attempts to read from a file path, the send operation will return an error. Note: If this option is also set in the transport configuration, the transport-level setting takes precedence.
-- **disableUrlAccess** - When set to `true`, prevents Nodemailer from fetching content from URLs. This is useful for preventing server-side request forgery (SSRF) attacks when processing untrusted email data. Note: If this option is also set in the transport configuration, the transport-level setting takes precedence.
+- **disableFileAccess** - 设置为 `true` 时，禁止 Nodemailer 从文件系统读取文件。构造不可信 JSON 数据邮件时应启用，以防攻击者读取任意文件。若附件或消息节点尝试读取文件路径，发送操作会返回错误。注意：若传输配置中同样设置了此项，以传输级别设置为准。
+- **disableUrlAccess** - 设置为 `true` 时，禁止 Nodemailer 从 URL 获取内容。防止服务器端请求伪造（SSRF）攻击。注意：若传输配置中也设置了此项，以传输级别设置为准。
 
-##### Advanced options
+##### 高级选项
 
-These options are rarely needed but provide fine-grained control over the generated MIME message:
+这些选项较少用，但可实现对生成 MIME 消息的精细控制：
 
-- **normalizeHeaderKey** - A function to customize header key casing. The function receives the header key and value as arguments and should return the normalized key. Useful when you need specific header capitalization for compatibility with certain email systems.
-- **boundaryPrefix** - A custom prefix for MIME boundary strings. Defaults to `'--_NmP'`. Boundaries separate different parts of a multipart message.
-- **baseBoundary** - A shared base string used when generating unique MIME boundaries. Defaults to a random hex string. All boundaries in the message will be derived from this value.
-- **newline** - Controls the line ending style in the generated message. Set to `'windows'` (or `'dos'`, `'win'`, `'\r\n'`) for Windows-style CRLF line endings, or `'unix'` (or `'linux'`, `'\n'`) for Unix-style LF line endings.
-- **xMailer** - A custom value for the X-Mailer header, which typically identifies the software that generated the email. Set to `false` to omit this header entirely.
-- **dkim** - Per-message DKIM signing configuration that overrides the transport-level settings. See [DKIM signing](/dkim/) for details.
+- **normalizeHeaderKey** - 自定义头部键名大小写的函数。接收头部键名和值为参数，返回规范化后的键名。适用于需要特定邮件系统兼容性的头部大小写处理。
+- **boundaryPrefix** - MIME 边界字符串的自定义前缀。默认 `'--_NmP'`。边界用于分隔多部分消息。
+- **baseBoundary** - 生成唯一 MIME 边界时使用的共享基础字符串。默认一个随机十六进制字符串。消息中所有边界都会从此派生。
+- **newline** - 控制生成邮件的换行符风格。设置为 `'windows'`（或 `'dos'`、`'win'`、`'\r\n'`）采用 Windows 风格 CRLF，或 `'unix'`（或 `'linux'`、`'\n'`）采用 Unix 风格 LF。
+- **xMailer** - 自定义 `X-Mailer` 头的值，通常用于标识发送邮件的软件。设置为 `false` 则不添加此头。
+- **dkim** - 每个邮件的 DKIM 签名配置，覆盖传输级别设置。详见[DKIM 签名](/dkim/)。
 
-The following example demonstrates setting a custom header and a specific date:
+以下示例演示设置自定义头部和指定日期：
 
 ```javascript
 const message = {
@@ -102,13 +102,13 @@ const message = {
 };
 ```
 
-You can also use a readable stream as the HTML content. When using streams, make sure to handle errors properly and clean up resources:
+你也可以使用可读流作为 HTML 内容。使用流时请确保正确处理错误并清理资源：
 
 ```javascript
 const htmlStream = fs.createReadStream("content.html");
 transporter.sendMail({ html: htmlStream }, function (err) {
   if (err) {
-    // If an error occurred, check if the stream is still open and close it
+    // 发生错误时，检查流是否仍打开，若是则关闭
     if (!htmlStream.closed) {
       htmlStream.destroy();
     }
@@ -116,9 +116,9 @@ transporter.sendMail({ html: htmlStream }, function (err) {
 });
 ```
 
-##### AMP example
+##### AMP 示例
 
-AMP4EMAIL allows you to create interactive, dynamic emails. The following example shows how to include an AMP version of your email alongside the standard text and HTML versions. Email clients that support AMP will display the AMP content, while others will fall back to the HTML or plaintext versions:
+AMP4EMAIL 让你打造交互式、动态邮件。以下示例展示如何在标准文本和 HTML 版本旁添加 AMP 版本。支持 AMP 的邮件客户端会显示 AMP 内容，其他客户端会显示 HTML 或纯文本版本：
 
 ```javascript
 const message = {

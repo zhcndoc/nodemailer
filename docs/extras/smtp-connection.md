@@ -1,120 +1,120 @@
 ---
-title: SMTP Connection
+title: SMTP 连接
 sidebar_position: 2
-description: Low-level SMTP client for establishing outbound connections to mail servers.
+description: 用于建立与邮件服务器的外发连接的低级别 SMTP 客户端。
 ---
 
-A low-level SMTP client for establishing outbound SMTP connections. This module is the foundation that powers Nodemailer's [SMTP transport](/smtp/) internally. Use it when you need direct, fine-grained control over the SMTP session lifecycle.
+一个用于建立外发 SMTP 连接的低级别 SMTP 客户端。该模块是 Nodemailer 内部驱动其 [SMTP 传输](/smtp/) 的基础。当你需要对 SMTP 会话生命周期进行直接且细粒度的控制时，使用此模块。
 
 :::info
-SMTPConnection is included with Nodemailer. No additional packages need to be installed.
+SMTPConnection 随 Nodemailer 一起提供，无需安装额外包。
 :::
 
-## Usage
+## 使用方法
 
-### 1. Import the module
+### 1. 导入模块
 
 ```javascript
 const SMTPConnection = require("nodemailer/lib/smtp-connection");
 ```
 
-### 2. Create a connection instance
+### 2. 创建连接实例
 
 ```javascript
 const connection = new SMTPConnection(options);
 ```
 
-### 3. Connect to the server
+### 3. 连接到服务器
 
 ```javascript
 connection.connect(callback);
 ```
 
-### 4. Authenticate (if required)
+### 4. 认证（如果需要）
 
 ```javascript
 connection.login(auth, callback);
 ```
 
-### 5. Send a message
+### 5. 发送邮件
 
 ```javascript
 connection.send(envelope, message, callback);
 ```
 
-### 6. Close the connection
+### 6. 关闭连接
 
 ```javascript
-connection.quit(); // or connection.close()
+connection.quit(); // 或 connection.close()
 ```
 
 ---
 
-## Options reference
+## 选项参考
 
-| Option                          | Type                | Default                | Description                                                                                      |
-| ------------------------------- | ------------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
-| **host**                        | `String`            | `'localhost'`          | The hostname or IP address of the SMTP server to connect to.                                     |
-| **port**                        | `Number`            | `587` or `465`         | The port number to connect to. Defaults to 465 when `secure` is true, otherwise 587. If port 465 is specified, `secure` defaults to true. |
-| **secure**                      | `Boolean`           | `false`                | If true, establishes a TLS connection immediately (implicit TLS). If false, the connection starts unencrypted but can be upgraded to TLS via STARTTLS. |
-| **servername**                  | `String`            | hostname               | The TLS server name for SNI (Server Name Indication). Automatically set to `host` value unless `host` is an IP address. |
-| **name**                        | `String`            | `os.hostname()`        | The hostname to identify as when sending EHLO/HELO commands. Falls back to `[127.0.0.1]` if the system hostname is not a valid FQDN. |
-| **localAddress**                | `String`            | -                      | The local network interface to bind to for outgoing connections.                                 |
-| **connectionTimeout**           | `Number`            | `120000`               | Maximum time in milliseconds to wait for the connection to be established (2 minutes).           |
-| **greetingTimeout**             | `Number`            | `30000`                | Maximum time in milliseconds to wait for the server greeting after the connection is established (30 seconds). |
-| **socketTimeout**               | `Number`            | `600000`               | Maximum time in milliseconds of inactivity before the connection is automatically closed (10 minutes). |
-| **dnsTimeout**                  | `Number`            | `30000`                | Maximum time in milliseconds to wait for DNS resolution (30 seconds).                            |
-| **logger**                      | `Boolean \| Object` | `false`                | Set to `true` to enable logging to the console, or provide a Bunyan-compatible logger instance for custom logging. |
-| **debug**                       | `Boolean`           | `false`                | If true, logs all SMTP traffic (commands and responses) to the logger.                           |
-| **lmtp**                        | `Boolean`           | `false`                | If true, uses the LMTP (Local Mail Transfer Protocol) protocol instead of SMTP.                  |
-| **ignoreTLS**                   | `Boolean`           | `false`                | If true, does not attempt STARTTLS even if the server advertises support for it.                 |
-| **requireTLS**                  | `Boolean`           | `false`                | If true, requires STARTTLS and fails if the upgrade is not successful.                           |
-| **opportunisticTLS**            | `Boolean`           | `false`                | If true, attempts STARTTLS but continues with an unencrypted connection if the upgrade fails.    |
-| **tls**                         | `Object`            | -                      | Additional options passed directly to Node.js `tls.connect()` and `tls.createSecureContext()`. Use this to configure certificates, ciphers, and other TLS settings. |
-| **socket**                      | `net.Socket`        | -                      | A pre-created socket to use instead of creating a new one. The socket should not yet be connected. |
-| **connection**                  | `net.Socket`        | -                      | An already-connected socket to use. Useful for connection pooling or [proxy](/smtp/proxies/) scenarios. |
-| **secured**                     | `Boolean`           | `false`                | Set to true when providing a socket via the `connection` option that has already been upgraded to TLS. |
-| **allowInternalNetworkInterfaces** | `Boolean`        | `false`                | If true, allows connections to internal or private network interfaces.                           |
-| **customAuth**                  | `Object`            | -                      | Custom authentication handlers for non-standard authentication methods (see [Custom Authentication](/smtp/customauth/)). |
-
----
-
-## Events
-
-SMTPConnection extends Node.js EventEmitter and emits the following events:
-
-| Event       | Arguments          | Description                                                              |
-| ----------- | ------------------ | ------------------------------------------------------------------------ |
-| **connect** | -                  | Emitted when the connection is established and the SMTP handshake completes successfully. |
-| **error**   | `Error`            | Emitted when an error occurs during the connection or SMTP session.      |
-| **end**     | -                  | Emitted when the connection has been closed.                             |
+| 选项                             | 类型                | 默认值                 | 描述                                                                                           |
+| ------------------------------ | ------------------- | --------------------- | ---------------------------------------------------------------------------------------------- |
+| **host**                       | `String`            | `'localhost'`         | 要连接的 SMTP 服务器的主机名或 IP 地址。                                                        |
+| **port**                       | `Number`            | `587` 或 `465`        | 连接端口号。当 `secure` 为 true 时默认是 465，否则为 587。如果指定端口为 465，`secure` 默认设置为 true。 |
+| **secure**                     | `Boolean`           | `false`               | 如果为 true，立即建立 TLS 连接（隐式 TLS）。如果为 false，连接开始时不加密，但可以通过 STARTTLS 升级为 TLS。 |
+| **servername**                 | `String`            | 主机名                 | TLS 的服务器名称用于 SNI（服务器名称指示）。如果 `host` 是 IP 地址，会自动设置为 `host` 的值。          |
+| **name**                       | `String`            | `os.hostname()`       | 发送 EHLO/HELO 命令时用于身份标识的主机名。如果系统主机名不是有效的 FQDN，则回退为 `[127.0.0.1]`。        |
+| **localAddress**               | `String`            | -                     | 用于绑定外发连接的本地网络接口。                                                                |
+| **connectionTimeout**          | `Number`            | `120000`              | 建立连接的最长等待时间，单位毫秒（2 分钟）。                                                    |
+| **greetingTimeout**            | `Number`            | `30000`               | 连接建立后等待服务器问候最长时间，单位毫秒（30 秒）。                                          |
+| **socketTimeout**              | `Number`            | `600000`              | 在无操作状态下，连接被自动关闭前的最长时间，单位毫秒（10 分钟）。                                |
+| **dnsTimeout**                 | `Number`            | `30000`               | DNS 解析的最长等待时间，单位毫秒（30 秒）。                                                     |
+| **logger**                     | `Boolean \| Object` | `false`               | 设置为 `true` 以启用控制台日志，或提供一个兼容 Bunyan 的 logger 实例以进行自定义日志记录。          |
+| **debug**                      | `Boolean`           | `false`               | 如果为 true，将向日志记录所有 SMTP 的命令与响应流量。                                           |
+| **lmtp**                       | `Boolean`           | `false`               | 如果为 true，使用 LMTP（本地邮件传输协议）代替 SMTP。                                           |
+| **ignoreTLS**                  | `Boolean`           | `false`               | 如果为 true，即使服务器支持也不会尝试 STARTTLS。                                                |
+| **requireTLS**                 | `Boolean`           | `false`               | 如果为 true，要求 STARTTLS 并在升级失败时返回失败。                                            |
+| **opportunisticTLS**           | `Boolean`           | `false`               | 如果为 true，尝试 STARTTLS，但升级失败时继续使用不加密连接。                                    |
+| **tls**                        | `Object`            | -                     | 直接传递给 Node.js `tls.connect()` 和 `tls.createSecureContext()` 的附加选项，用于配置证书、加密算法等。 |
+| **socket**                     | `net.Socket`        | -                     | 用于替代新建套接字的预创建套接字，但套接字尚未连接。                                           |
+| **connection**                 | `net.Socket`        | -                     | 一个已连接的套接字，适用于连接池或 [代理](/smtp/proxies/) 场景。                               |
+| **secured**                    | `Boolean`           | `false`               | 当通过 `connection` 选项提供已升级为 TLS 的套接字时设置为 true。                               |
+| **allowInternalNetworkInterfaces** | `Boolean`        | `false`               | 如果为 true，允许连接到内部或私有网络接口。                                                    |
+| **customAuth**                 | `Object`            | -                     | 非标准认证方式的自定义认证处理程序（参见 [自定义认证](/smtp/customauth/)）。                   |
 
 ---
 
-## Methods
+## 事件
+
+SMTPConnection 继承自 Node.js 的 EventEmitter，并触发以下事件：
+
+| 事件          | 参数              | 描述                                                               |
+| ------------ | ----------------- | ------------------------------------------------------------------ |
+| **connect**  | -                 | 连接建立并完成 SMTP 握手时触发。                                    |
+| **error**    | `Error`           | 连接或 SMTP 会话期间出现错误时触发。                                |
+| **end**      | -                 | 连接关闭时触发。                                                    |
+
+---
+
+## 方法
 
 ### `connect(callback)`
 
-Establishes a connection to the SMTP server. The callback is invoked when the connection is ready for commands (after the initial greeting and EHLO/HELO handshake).
+建立与 SMTP 服务器的连接。回调在连接准备就绪可接收命令时（初始问候和 EHLO/HELO 握手后）调用。
 
 ```javascript
 connection.connect((err) => {
   if (err) {
-    console.error("Connection failed:", err);
+    console.error("连接失败:", err);
     return;
   }
-  console.log("Connected!");
+  console.log("已连接!");
 });
 ```
 
 ### `login(auth, callback)`
 
-Authenticates with the SMTP server. Only call this method if the server requires authentication. The `auth` object accepts the following properties:
+与 SMTP 服务器进行认证。仅当服务器需要认证时调用此方法。`auth` 对象支持以下属性：
 
-- `user` - The username for authentication
-- `pass` - The password for authentication
-- `method` - The authentication method to use (optional). If not specified, the client automatically selects the best available method supported by the server
-- `oauth2` - An [OAuth2](/smtp/oauth2/) token provider object for XOAUTH2 authentication
+- `user` - 认证用户名
+- `pass` - 认证密码
+- `method` - 使用的认证方式（可选）。未指定时由客户端自动选择服务器支持的最佳方式
+- `oauth2` - 供 XOAUTH2 认证使用的 [OAuth2](/smtp/oauth2/) 令牌提供者对象
 
 ```javascript
 connection.login(
@@ -124,19 +124,19 @@ connection.login(
   },
   (err) => {
     if (err) {
-      console.error("Authentication failed:", err);
+      console.error("认证失败:", err);
       return;
     }
-    console.log("Authenticated!");
+    console.log("认证成功!");
   }
 );
 ```
 
 ### `send(envelope, message, callback)`
 
-Sends an email message. The `envelope` defines the sender and recipient addresses for the SMTP transaction, while `message` contains the RFC 5322 formatted email content.
+发送邮件。`envelope` 定义 SMTP 事务的发件人与收件人地址，`message` 包含符合 RFC 5322 格式的邮件内容。
 
-The `message` parameter can be a String, Buffer, or a readable Stream.
+`message` 参数可以是字符串、Buffer 或可读流。
 
 ```javascript
 const envelope = {
@@ -148,40 +148,40 @@ const message = "From: sender@example.com\r\nTo: recipient@example.com\r\nSubjec
 
 connection.send(envelope, message, (err, info) => {
   if (err) {
-    console.error("Send failed:", err);
+    console.error("发送失败:", err);
     return;
   }
-  console.log("Message sent:", info);
+  console.log("邮件已发送:", info);
 });
 ```
 
-The callback receives an `info` object with the following properties:
+回调接收一个 `info` 对象，包含以下属性：
 
-- `accepted` - Array of recipient addresses that were accepted by the server
-- `rejected` - Array of recipient addresses that were rejected by the server
-- `rejectedErrors` - Array of Error objects with details for each rejected recipient
-- `response` - The final response string from the server
-- `envelopeTime` - Time in milliseconds spent sending the envelope (MAIL FROM and RCPT TO commands)
-- `messageTime` - Time in milliseconds spent sending the message data
-- `messageSize` - Size of the sent message in bytes
+- `accepted` - 被服务器接受的收件人地址数组
+- `rejected` - 被服务器拒绝的收件人地址数组
+- `rejectedErrors` - 与每个拒绝收件人相关的错误对象数组
+- `response` - 服务器的最终响应字符串
+- `envelopeTime` - 发送信封（MAIL FROM 和 RCPT TO 命令）耗时，单位毫秒
+- `messageTime` - 发送邮件数据耗时，单位毫秒
+- `messageSize` - 发送邮件的字节大小
 
 ### `reset(callback)`
 
-Sends the SMTP RSET command to reset the current session state. Use this to abort a message transaction without closing the connection.
+发送 SMTP RSET 命令以重置当前会话状态。用于在不关闭连接的情况下放弃当前邮件事务。
 
 ```javascript
 connection.reset((err, success) => {
   if (err) {
-    console.error("Reset failed:", err);
+    console.error("重置失败:", err);
     return;
   }
-  console.log("Session reset");
+  console.log("会话已重置");
 });
 ```
 
 ### `quit()`
 
-Sends the SMTP QUIT command and gracefully closes the connection. The server is notified that the session is ending.
+发送 SMTP QUIT 命令并优雅地关闭连接。服务器收到会话结束通知。
 
 ```javascript
 connection.quit();
@@ -189,7 +189,7 @@ connection.quit();
 
 ### `close()`
 
-Closes the connection immediately without sending the QUIT command. Use this for forced disconnection scenarios.
+立即关闭连接，不发送 QUIT 命令。用于强制断开场景。
 
 ```javascript
 connection.close();
@@ -197,40 +197,40 @@ connection.close();
 
 ---
 
-## Envelope options
+## 信封选项
 
-The envelope object defines the SMTP transaction parameters and supports the following properties:
+信封对象定义 SMTP 事务参数，支持以下属性：
 
-| Property       | Type       | Description                                                      |
-| -------------- | ---------- | ---------------------------------------------------------------- |
-| **from**       | `String`   | The sender address used in the MAIL FROM command.                |
-| **to**         | `String[]` | An array of recipient addresses used in RCPT TO commands.        |
-| **size**       | `Number`   | The message size in bytes. Used with the SIZE extension to check if the server accepts the message before sending. |
-| **use8BitMime**| `Boolean`  | If true, requests 8BITMIME encoding when the server supports it. |
-| **dsn**        | `Object`   | Delivery Status Notification options (see below).                |
+| 属性          | 类型       | 描述                                                       |
+| ------------ | ---------- | ---------------------------------------------------------- |
+| **from**     | `String`   | MAIL FROM 命令中使用的发件人地址。                         |
+| **to**       | `String[]` | RCPT TO 命令中使用的收件人地址数组。                       |
+| **size**     | `Number`   | 邮件大小（字节）。用于 SIZE 扩展，发送前检查服务器是否接受。|
+| **use8BitMime** | `Boolean` | 如果为 true，当服务器支持时请求 8BITMIME 编码。             |
+| **dsn**      | `Object`   | 投递状态通知选项（见下文）。                               |
 
-### DSN options
+### DSN 选项
 
-Delivery Status Notifications allow you to receive reports about the delivery status of your message. The DSN object supports these properties:
+投递状态通知允许您获得邮件投递状态的报告。DSN 对象支持以下属性：
 
 ```javascript
 const envelope = {
   from: "sender@example.com",
   to: ["recipient@example.com"],
   dsn: {
-    ret: "HDRS", // What to return in DSN: 'HDRS' for headers only, 'FULL' for the complete message
-    envid: "unique-id-123", // A unique envelope identifier for tracking
-    notify: "SUCCESS,FAILURE", // When to send DSN: 'NEVER', 'SUCCESS', 'FAILURE', 'DELAY' (comma-separated)
-    orcpt: "rfc822;original@example.com", // The original recipient address (format: address-type;address)
+    ret: "HDRS", // DSN 返回内容： 'HDRS' 表示仅返回头部，'FULL' 表示返回完整消息
+    envid: "unique-id-123", // 用于跟踪的唯一信封标识符
+    notify: "SUCCESS,FAILURE", // 何时发送 DSN：'NEVER', 'SUCCESS', 'FAILURE', 'DELAY'（逗号分隔）
+    orcpt: "rfc822;original@example.com", // 原始收件人地址（格式为地址类型;地址）
   },
 };
 ```
 
 ---
 
-## Complete example
+## 完整示例
 
-This example demonstrates the full workflow: connecting, authenticating, sending a message, and closing the connection.
+此示例演示完整工作流程：连接、认证、发送邮件和关闭连接。
 
 ```javascript
 const SMTPConnection = require("nodemailer/lib/smtp-connection");
@@ -244,12 +244,12 @@ const connection = new SMTPConnection({
 });
 
 connection.on("error", (err) => {
-  console.error("Connection error:", err);
+  console.error("连接错误:", err);
 });
 
 connection.connect((err) => {
   if (err) {
-    console.error("Failed to connect:", err);
+    console.error("连接失败:", err);
     return;
   }
 
@@ -260,7 +260,7 @@ connection.connect((err) => {
     },
     (err) => {
       if (err) {
-        console.error("Authentication failed:", err);
+        console.error("认证失败:", err);
         connection.close();
         return;
       }
@@ -272,19 +272,19 @@ connection.connect((err) => {
 
       const message = `From: sender@example.com
 To: recipient@example.com
-Subject: Test Message
+Subject: 测试邮件
 Content-Type: text/plain; charset=utf-8
 
-Hello from SMTPConnection!`;
+来自 SMTPConnection 的问候！`;
 
       connection.send(envelope, message, (err, info) => {
         if (err) {
-          console.error("Failed to send:", err);
+          console.error("发送失败:", err);
         } else {
-          console.log("Message sent!");
-          console.log("Accepted:", info.accepted);
-          console.log("Rejected:", info.rejected);
-          console.log("Response:", info.response);
+          console.log("邮件已发送！");
+          console.log("接受地址:", info.accepted);
+          console.log("拒绝地址:", info.rejected);
+          console.log("服务器响应:", info.response);
         }
 
         connection.quit();
@@ -296,34 +296,34 @@ Hello from SMTPConnection!`;
 
 ---
 
-## Properties
+## 属性
 
-After connecting, you can access the following properties on the connection instance:
+连接建立后，可以访问连接实例上的以下属性：
 
-| Property           | Type       | Description                                          |
-| ------------------ | ---------- | ---------------------------------------------------- |
-| **id**             | `String`   | A unique identifier for this connection instance.    |
-| **secure**         | `Boolean`  | True if the connection is using TLS encryption.      |
-| **authenticated**  | `Boolean`  | True if the user has successfully authenticated.     |
-| **lastServerResponse** | `String` | The most recent response received from the server. |
-| **allowsAuth**     | `Boolean`  | True if the server advertises authentication support in its EHLO response. |
-
----
-
-## Supported authentication methods
-
-SMTPConnection supports the following authentication methods:
-
-- `PLAIN` - Sends credentials in base64 encoding
-- `LOGIN` - Legacy method that sends username and password separately
-- `CRAM-MD5` - Challenge-response authentication using MD5 hashing
-- `XOAUTH2` - [OAuth 2.0](/smtp/oauth2/) authentication for services like Gmail
-- Custom methods via the `customAuth` option
-
-The client automatically selects the most secure available method unless you specify one explicitly.
+| 属性                   | 类型       | 描述                                               |
+| ---------------------- | ---------- | -------------------------------------------------- |
+| **id**                 | `String`   | 该连接实例的唯一标识符。                            |
+| **secure**             | `Boolean`  | 连接是否使用 TLS 加密。                             |
+| **authenticated**      | `Boolean`  | 用户是否已成功认证。                               |
+| **lastServerResponse** | `String`   | 最近收到的来自服务器的响应。                        |
+| **allowsAuth**         | `Boolean`  | 服务器是否在其 EHLO 响应中支持认证。               |
 
 ---
 
-## License
+## 支持的认证方法
+
+SMTPConnection 支持以下认证方法：
+
+- `PLAIN` - 使用 Base64 编码发送凭据
+- `LOGIN` - 旧方法，分别发送用户名和密码
+- `CRAM-MD5` - 使用 MD5 哈希的质询响应认证
+- `XOAUTH2` - 适用于 Gmail 等服务的 [OAuth 2.0](/smtp/oauth2/) 认证
+- 通过 `customAuth` 选项实现自定义方法
+
+客户端会自动选择最安全且被服务器支持的认证方法，除非你明确指定。
+
+---
+
+## 许可证
 
 [MIT](https://github.com/nodemailer/nodemailer/blob/master/LICENSE)

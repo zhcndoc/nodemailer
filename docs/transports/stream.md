@@ -1,67 +1,67 @@
 ---
-title: Stream transport
+title: 流传输
 sidebar_position: 28
-description: Generate RFC 822 messages as streams, Buffers, or JSON objects for testing or custom delivery workflows.
+description: 以流、Buffer 或 JSON 对象的形式生成 RFC 822 消息，用于测试或自定义投递流程。
 ---
 
-Stream transport is **not** a real SMTP transport. Instead of delivering your message to a remote mail server, it _generates_ the complete RFC 822 formatted email and returns it to you. This makes it ideal for:
+流传输 **不是** 一个真正的 SMTP 传输。它不是将你的邮件发送到远程邮件服务器，而是 _生成_ 完整的 RFC 822 格式的邮件内容并返回给你。这使其非常适合：
 
-- **[Testing](../smtp/testing)** - Examine the exact bytes that would be sent over the wire, create snapshot tests, or forward the output to another system for validation.
-- **Custom delivery pipelines** - Apply Nodemailer plugins (such as DKIM signing or list headers) to your message, then handle delivery yourself through an internal API, archive messages for audit logging, or process them in any custom way.
+- **[测试](../smtp/testing)** - 检查将要通过网络发送的精确字节，创建快照测试，或者将输出转发给其他系统进行验证。
+- **自定义投递流程** - 对邮件应用 Nodemailer 插件（例如 DKIM 签名或列表头），然后通过内部 API 自行处理投递，归档邮件以供审计记录，或者以任何自定义方式处理。
 
-For an overview of all available transports, see the [transports documentation](./index.md).
+有关所有可用传输的概述，请参见 [传输文档](./index.md)。
 
 ---
 
-## Enabling Stream transport
+## 启用流传输
 
-To use Stream transport, create a transporter with `streamTransport: true` in the options object:
+要使用流传输，请在选项对象中设置 `streamTransport: true` 来创建一个 transporter：
 
 ```javascript
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   streamTransport: true,
-  // See additional options below
+  // 参见下文的更多选项
 });
 ```
 
-### Options
+### 选项
 
-| Option            | Type                  | Default      | Description                                                                                        |
-| ----------------- | --------------------- | ------------ | -------------------------------------------------------------------------------------------------- |
-| `streamTransport` | `boolean`             | **required** | Set to `true` to enable Stream transport.                                                          |
-| `buffer`          | `boolean`             | `false`      | When `true`, returns the generated message as a `Buffer` instead of a `Readable` stream.           |
-| `newline`         | `'windows' \| 'unix'` | `'unix'`     | Line ending style for the generated message. Use `'windows'` for CRLF (`\r\n`) or `'unix'` for LF (`\n`). |
+| 选项               | 类型                   | 默认值       | 描述                                                                                             |
+| ------------------ | ---------------------- | ------------ | ------------------------------------------------------------------------------------------------ |
+| `streamTransport`  | `boolean`              | **必填**     | 设置为 `true` 以启用流传输。                                                                      |
+| `buffer`           | `boolean`              | `false`      | 设置为 `true` 时，生成的邮件将作为 `Buffer` 返回，而不是作为可读流（`Readable`）。                    |
+| `newline`          | `'windows' \| 'unix'`  | `'unix'`     | 生成邮件的换行符样式。使用 `'windows'` 表示 CRLF (`\r\n`)，使用 `'unix'` 表示 LF (`\n`)。           |
 
-:::note JSON Transport
-A separate **JSON transport** is also available. Enable it by setting `jsonTransport: true` (instead of `streamTransport`). JSON transport returns a serialized JSON representation of the message rather than the raw RFC 822 format. See the [JSON transport section](#json-transport) below for details.
+:::note JSON 传输
+还有一个独立的 **JSON 传输** 可用。通过设置 `jsonTransport: true`（而不是 `streamTransport`）启用它。JSON 传输返回消息的序列化 JSON 表示，而非原始的 RFC 822 格式。详情请参阅下面的 [JSON 传输部分](#json-transport)。
 :::
 
-### `sendMail()` callback signature
+### `sendMail()` 回调函数签名
 
-The `sendMail()` callback receives two arguments: `(err, info)`. On success, the `info` object contains:
+`sendMail()` 的回调函数接收两个参数：`(err, info)`。成功时，`info` 对象包含：
 
-- **`envelope`** - The SMTP envelope object with `from` (string) and `to` (array of strings) properties.
-- **`messageId`** - The generated _Message-ID_ header value for this email.
-- **`message`** - The generated email content. By default this is a Node.js `Readable` stream. If you set `buffer: true`, it will be a `Buffer`. For JSON transport, it will be a JSON string (or a plain object if `skipEncoding: true`).
+- **`envelope`** - SMTP 信封对象，包含 `from`（字符串）和 `to`（字符串数组）属性。
+- **`messageId`** - 生成的邮件 _Message-ID_ 头字段值。
+- **`message`** - 生成的邮件内容。默认是 Node.js 的 `Readable` 流。如果设置了 `buffer: true`，则为 `Buffer`。对于 JSON 传输，则为 JSON 字符串（如果设置了 `skipEncoding: true`，则为普通对象）。
 
-For details on configuring the message object passed to `sendMail()`, see the [message configuration](../message/) documentation. To parse the generated RFC 822 stream output, you can use [MailParser](../extras/mailparser).
+有关配置传递给 `sendMail()` 的邮件对象的详细信息，请参见 [邮件配置](../message/) 文档。要解析生成的 RFC 822 流输出，可以使用 [MailParser](../extras/mailparser)。
 
 ---
 
-## Examples
+## 示例
 
-### 1. Stream a message with Windows-style line endings
+### 1. 使用 Windows 样式换行符流式传输邮件
 
-This example generates an email as a readable stream using Windows-style CRLF line endings. The stream can be piped to any writable destination.
+该示例生成一个可读流邮件，使用 Windows 样式 CRLF 换行符。可将此流管道（pipe）转发到任何可写目标。
 
 ```javascript
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   streamTransport: true,
-  newline: "windows", // Use CRLF (\r\n) line endings
+  newline: "windows", // 使用 CRLF (\r\n) 换行
 });
 
 transporter.sendMail(
@@ -75,23 +75,23 @@ transporter.sendMail(
     if (err) throw err;
     console.log(info.envelope);   // { from: '...', to: ['...'] }
     console.log(info.messageId);  // '<unique-id@example.com>'
-    // Pipe the raw RFC 822 message to stdout
+    // 将原始 RFC 822 消息输出到标准输出
     info.message.pipe(process.stdout);
   }
 );
 ```
 
-### 2. Return a Buffer with Unix-style line endings
+### 2. 返回带 Unix 样式换行符的 Buffer
 
-When you need the entire message in memory at once, set `buffer: true`. This example also explicitly uses Unix-style LF line endings (the default).
+当你需要一次性将整个邮件存储到内存中时，设置 `buffer: true`。此示例显式使用 Unix 样式 LF 换行符（默认值）。
 
 ```javascript
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   streamTransport: true,
-  buffer: true,    // Return a Buffer instead of a stream
-  newline: "unix", // Use LF (\n) line endings (this is the default)
+  buffer: true,    // 返回 Buffer 而非流
+  newline: "unix", // 使用 LF (\n) 换行（默认）
 });
 
 transporter.sendMail(
@@ -105,17 +105,17 @@ transporter.sendMail(
     if (err) throw err;
     console.log(info.envelope);
     console.log(info.messageId);
-    // The complete message is available as a Buffer
+    // 整封邮件作为 Buffer 可用
     console.log(info.message.toString());
   }
 );
 ```
 
-### 3. Generate a JSON-encoded message object (>= v3.1.0) {#json-transport}
+### 3. 生成 JSON 编码的邮件对象（>= v3.1.0） {#json-transport}
 
-**JSON transport** is a separate transport type, not an option of Stream transport. To use it, set `jsonTransport: true` instead of `streamTransport`. The resulting `info.message` will be a JSON string representing the message structure. This format is useful for storing messages, inspecting them in tests, or passing them to other systems. Binary data such as attachments is automatically base64-encoded.
+**JSON 传输** 是一种独立的传输类型，而不是流传输的选项。使用时，请设置 `jsonTransport: true` 代替 `streamTransport`。生成的 `info.message` 是表示邮件结构的 JSON 字符串。这种格式适合存储邮件、测试时检查邮件内容或传递给其他系统。邮件中的二进制数据（如附件）会自动进行 base64 编码。
 
-If you prefer to work with a JavaScript object rather than a JSON string, set `skipEncoding: true` to receive the raw data object directly.
+如果你更愿意处理 JavaScript 对象而非 JSON 字符串，可设置 `skipEncoding: true` 来直接获取原始数据对象。
 
 ```javascript
 const nodemailer = require("nodemailer");
@@ -135,12 +135,12 @@ transporter.sendMail(
     if (err) throw err;
     console.log(info.envelope);
     console.log(info.messageId);
-    console.log(info.message); // JSON string
+    console.log(info.message); // JSON 字符串
   }
 );
 ```
 
-Here is an example of what the JSON output looks like:
+以下是 JSON 输出的示例：
 
 ```json
 {
@@ -155,13 +155,13 @@ Here is an example of what the JSON output looks like:
 
 ---
 
-## When to choose Stream vs. JSON transport
+## 何时选择流传输或 JSON 传输
 
-Use the following table to help decide which transport best fits your needs:
+以下表格帮助你决定哪种传输方式更适合你的需求：
 
-| Use case                                            | Recommended transport                   |
-| --------------------------------------------------- | --------------------------------------- |
-| Inspect or pipe raw RFC 822 SMTP content            | `streamTransport` (Stream or Buffer)    |
-| Store structured message data for later replay      | `jsonTransport`                         |
-| Apply Nodemailer plugins (DKIM, headers, etc.)      | Either (plugins run before output)      |
-| Need access to the `_raw` property (see [custom source](../message/custom-source)) | **Stream transport only** |
+| 使用场景                                           | 推荐的传输方式                         |
+| ------------------------------------------------- | ----------------------------------- |
+| 检查或管道传输原始 RFC 822 SMTP 内容              | `streamTransport`（流或 Buffer）     |
+| 存储结构化的邮件数据以供后续重放                   | `jsonTransport`                     |
+| 应用 Nodemailer 插件（如 DKIM、邮件头等）          | 两者皆可（插件在输出前运行）          |
+| 需要访问 `_raw` 属性（参见 [自定义源](../message/custom-source)） | **仅限流传输**                     />

@@ -1,39 +1,39 @@
 ---
-title: List headers
+title: 列表头部
 sidebar_position: 16
-description: Add RFC 2369 List-* headers for mailing list functionality like unsubscribe links.
+description: 为邮件列表功能添加 RFC 2369 的 List-* 头部，例如退订链接。
 ---
 
-Mailing lists use special [RFC 2369](https://www.rfc-editor.org/rfc/rfc2369) **`List-*` headers** (such as `List-Help`, `List-Unsubscribe`, and others) to help email clients display useful actions like "Unsubscribe" buttons. Instead of manually constructing these headers using the [custom headers](./custom-headers) option, you can use Nodemailer's **`list`** option to define them in a simple, declarative way.
+邮件列表使用特殊的 [RFC 2369](https://www.rfc-editor.org/rfc/rfc2369) **`List-*` 头部**（如 `List-Help`、`List-Unsubscribe` 等）来帮助邮件客户端显示“退订”按钮等有用操作。你可以使用 Nodemailer 的 **`list`** 选项以简单声明式的方式定义这些头部，而不必手动通过 [自定义头部](./custom-headers) 选项构造它们。
 
-## How it works
+## 工作原理
 
-Add a `list` object to your `transporter.sendMail()` call. Each property name in this object corresponds to a `List-*` header. The property names are case-insensitive, so `help` creates a `List-Help` header, `unsubscribe` creates `List-Unsubscribe`, and so on.
+在 `transporter.sendMail()` 调用中添加一个 `list` 对象。该对象中的每个属性名对应一个 `List-*` 头部。属性名不区分大小写，例如 `help` 会生成 `List-Help` 头部，`unsubscribe` 会生成 `List-Unsubscribe`，等等。
 
-### Value formats
+### 值的格式
 
-| Value type                            | Result                                                                                                     |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `string`                              | A single URL. Nodemailer automatically wraps it in angle brackets (`<...>`) and adds `mailto:` if needed. |
-| `{ url, comment }`                    | A URL with an optional human-readable comment displayed after it.                                          |
-| `Array< string \| { url, comment } >` | Multiple separate header lines for the same `List-*` type.                                                 |
-| Nested array (`Array<Array<...>>`)    | Multiple URLs combined into a single header line, separated by commas.                                     |
+| 值类型                            | 结果                                                                                                     |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `string`                          | 单个 URL。Nodemailer 会自动用尖括号（`<...>`）包裹，并在必要时加上 `mailto:` 前缀。                     |
+| `{ url, comment }`                | 带有可选人类可读注释的 URL，注释会显示在 URL 后面。                                                    |
+| `Array< string \| { url, comment } >` | 针对同一种 `List-*` 类型生成多条独立的头部行。                                                        |
+| 嵌套数组 (`Array<Array<...>>`)  | 多个 URL 合并在同一条头部行内，用逗号分隔。                                                          |
 
-:::tip URL handling
-Nodemailer automatically formats URLs for you:
-- Email addresses like `admin@example.com` become `<mailto:admin@example.com>`
-- URLs starting with `http`, `https`, `mailto`, or `ftp` are wrapped in angle brackets as-is
-- Other strings are treated as domains and prefixed with `http://`
+:::tip URL 处理
+Nodemailer 会自动格式化 URL：
+- 像 `admin@example.com` 这样的邮箱地址会变成 `<mailto:admin@example.com>`
+- 以 `http`、`https`、`mailto` 或 `ftp` 开头的 URL 会按原样用尖括号包裹
+- 其他字符串按域名处理，前缀加 `http://`
 
-Comments containing non-ASCII characters are automatically encoded for email compatibility.
+含有非 ASCII 字符的注释会自动编码以保证邮箱兼容性。
 :::
 
-## Complete example
+## 完整示例
 
 ```javascript
 const nodemailer = require("nodemailer");
 
-// 1. Create a transport (replace with your configuration)
+// 1. 创建传输器（请替换为你的配置）
 const transporter = nodemailer.createTransport({
   host: "smtp.example.com",
   port: 587,
@@ -43,13 +43,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// 2. Send a message with various List-* headers
+// 2. 发送包含各种 List-* 头部的邮件
 async function sendListMessage() {
   await transporter.sendMail({
     from: "sender@example.com",
     to: "recipient@example.com",
     subject: "List Message",
-    text: "I hope no one unsubscribes from this list!",
+    text: "我希望没人会退订这个列表！",
     list: {
       // List-Help: <mailto:admin@example.com?subject=help>
       help: "admin@example.com?subject=help",
@@ -60,7 +60,7 @@ async function sendListMessage() {
         comment: "Comment",
       },
 
-      // Two separate List-Subscribe header lines:
+      // 两条独立的 List-Subscribe 头部行：
       // List-Subscribe: <mailto:admin@example.com?subject=subscribe>
       // List-Subscribe: <http://example.com> (Subscribe)
       subscribe: [
@@ -71,7 +71,7 @@ async function sendListMessage() {
         },
       ],
 
-      // Multiple URLs in a single List-Post header line:
+      // 单条 List-Post 头部行内多个 URL：
       // List-Post: <http://example.com/post>, <mailto:admin@example.com?subject=post> (Post)
       post: [
         [
@@ -85,15 +85,15 @@ async function sendListMessage() {
     },
   });
 
-  console.log("List message sent");
+  console.log("列表邮件已发送");
 }
 
 sendListMessage().catch(console.error);
 ```
 
-### Resulting headers
+### 生成的头部
 
-The example above produces these email headers:
+上述示例生成的邮件头部如下：
 
 ```txt
 List-Help: <mailto:admin@example.com?subject=help>

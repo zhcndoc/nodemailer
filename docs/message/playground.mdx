@@ -1,69 +1,69 @@
 ---
-title: Message Playground
+title: 消息演示场
 sidebar_position: 10
-description: Interactive playground to preview how your Nodemailer message configuration renders as an email.
+description: 交互式演示场，用于预览你的 Nodemailer 消息配置在邮件中的渲染效果。
 ---
 
 import EmailPlayground from '@site/src/components/EmailPlayground';
 
-# Message Playground
+# 消息演示场
 
-Use this interactive playground to experiment with Nodemailer message configuration and see a live preview of how your email will appear to recipients.
+使用此交互式演示场来尝试 Nodemailer 消息配置，并实时预览你的邮件在收件人那里的显示效果。
 
-Switch between the **Editor** tab to modify the JSON configuration and the **Preview** tab to see how your email will render. The playground supports all common message fields including `from`, `to`, `cc`, `bcc`, `subject`, `text`, and `html`.
+切换至 **编辑器** 标签以修改 JSON 配置，切换至 **预览** 标签查看邮件的渲染效果。演示场支持所有常见的消息字段，包括 `from`、`to`、`cc`、`bcc`、`subject`、`text` 和 `html`。
 
 <EmailPlayground />
 
-## Supported fields
+## 支持的字段
 
-The playground supports the following message configuration fields:
+演示场支持以下消息配置字段：
 
-| Field | Description |
-|-------|-------------|
-| `from` | Sender address (string or object with `name` and `address`) |
-| `to` | Recipient address(es) - string, array, or object |
-| `cc` | Carbon copy recipient(s) |
-| `bcc` | Blind carbon copy recipient(s) |
-| `replyTo` | Reply-to address(es) |
-| `subject` | Email subject line |
-| `text` | Plain text message body |
-| `html` | HTML message body (takes precedence over `text`) |
-| `attachments` | Array of attachment objects (see limitations below) |
+| 字段       | 描述                                             |
+|------------|--------------------------------------------------|
+| `from`     | 发件人地址（字符串或包含 `name` 和 `address` 的对象）     |
+| `to`       | 收件人地址（字符串、数组或对象）                          |
+| `cc`       | 抄送收件人                                           |
+| `bcc`      | 密送收件人                                           |
+| `replyTo`  | 回复地址                                            |
+| `subject`  | 邮件主题行                                           |
+| `text`     | 纯文本邮件正文                                        |
+| `html`     | HTML 邮件正文（优先于 `text`）                          |
+| `attachments` | 附件对象数组（见下面的限制说明）                         |
 
 :::tip
-If you only provide a `text` field without `html`, the playground will automatically convert the plain text to a simple HTML representation for preview purposes.
+如果你只提供了 `text` 字段而没有 `html`，演示场会自动将纯文本转换为简单的 HTML 表示以供预览。
 :::
 
-:::warning Attachment limitations
-The playground only supports attachments with base64-encoded content. Other content sources (file paths, URLs, streams, buffers) are not available in the browser environment. Each attachment must include:
-- `content` - Base64-encoded string
-- `encoding` - Must be set to `"base64"`
-- `filename` - Name of the file
-- `contentType` - MIME type (optional, detected from filename if omitted)
-- `cid` - Content-ID for embedding images in HTML (optional)
+:::warning 附件限制
+演示场只支持带有 base64 编码内容的附件。其他内容来源（文件路径、URL、流、缓冲区）在浏览器环境中不可用。每个附件必须包含：
+- `content` - base64 编码的字符串
+- `encoding` - 必须设置为 `"base64"`
+- `filename` - 文件名
+- `contentType` - MIME 类型（可选，省略时根据文件名自动检测）
+- `cid` - 嵌入 HTML 图片的内容 ID（可选）
 
-Attachments with a `cid` value can be referenced in HTML using `<img src="cid:your-cid-value">`.
+带有 `cid` 值的附件，可以在 HTML 中用 `<img src="cid:your-cid-value">` 进行引用。
 :::
 
-## Address formats
+## 地址格式
 
-You can specify email addresses in several formats:
+你可以用多种格式指定电子邮件地址：
 
 ```json
-// Plain email address
+// 纯邮箱地址
 "to": "recipient@example.com"
 
-// With display name
+// 带显示名称
 "to": "\"Recipient Name\" <recipient@example.com>"
 
-// Object format
+// 对象格式
 "to": { "name": "Recipient Name", "address": "recipient@example.com" }
 
-// Multiple recipients (array)
+// 多个收件人（数组）
 "to": ["user1@example.com", "user2@example.com"]
 
-// Multiple recipients (comma-separated)
+// 多个收件人（逗号分隔）
 "to": "user1@example.com, user2@example.com"
 ```
 
-For more details on message configuration, see the [message configuration reference](./index.md).
+更多消息配置详情，请参阅 [消息配置参考](./index.md)。

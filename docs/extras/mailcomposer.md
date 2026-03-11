@@ -1,36 +1,36 @@
 ---
 title: Mailcomposer
 sidebar_position: 4
-description: Generate RFC 822-formatted email messages that can be streamed or saved to disk.
+description: 生成符合 RFC 822 格式的电子邮件消息，可以直接流式传输或保存到磁盘。
 ---
 
-Generate RFC 822-formatted email messages that you can stream directly to an SMTP connection or save to disk for later use. This is the inverse of [MailParser](./mailparser), which parses raw messages back into structured objects.
+生成符合 RFC 822 格式的电子邮件消息，你可以将其直接流式传输到 SMTP 连接或保存到磁盘以备后用。这是 [MailParser](./mailparser) 的逆过程，MailParser 是将原始消息解析回结构化对象。
 
 :::info
-Mailcomposer is included with Nodemailer. There is no separate package to install.
+Mailcomposer 随 Nodemailer 一起提供，无需单独安装。
 :::
 
-## Usage
+## 使用方法
 
-### 1. Install Nodemailer
+### 1. 安装 Nodemailer
 
 ```bash
 npm install nodemailer
 ```
 
-### 2. Import MailComposer in your code
+### 2. 在代码中导入 MailComposer
 
 ```js
 const MailComposer = require("nodemailer/lib/mail-composer");
 ```
 
-### 3. Create a MailComposer instance
+### 3. 创建 MailComposer 实例
 
 ```js
 const mail = new MailComposer(mailOptions);
 ```
 
-The `mailOptions` parameter is an object that defines your email message. See the complete list of available options in the [Message fields](#message-fields) section below.
+`mailOptions` 参数是一个定义电子邮件消息的对象。可用选项的完整列表见下方的 [消息字段](#消息字段) 部分。
 
 ---
 
@@ -38,7 +38,7 @@ The `mailOptions` parameter is an object that defines your email message. See th
 
 ### `createReadStream()`
 
-Returns a readable stream that emits the raw RFC 822 message. This is useful when you want to pipe the message directly to another stream without loading the entire message into memory.
+返回一个可读流，发出原始 RFC 822 消息。当你想直接将消息通过管道传输到另一个流，而无需将整个消息加载到内存时，此方法非常有用。
 
 ```js
 const mail = new MailComposer({ from: "you@example.com" /* ... */ });
@@ -49,7 +49,7 @@ stream.pipe(process.stdout);
 
 ### `build(callback)`
 
-Generates the complete message and returns it as a `Buffer` through a callback function. Use this method when you need the entire message in memory, for example to save it to a file or send it via an API.
+生成完整消息，通过回调函数以 `Buffer` 形式返回。当你需要整个消息加载到内存中时使用，例如保存到文件或通过 API 发送。
 
 ```js
 const mail = new MailComposer({ from: "you@example.com" /* ... */ });
@@ -62,93 +62,93 @@ mail.compile().build((err, message) => {
 
 ---
 
-## Message fields
+## 消息字段
 
-MailComposer accepts the same message options as Nodemailer's [message configuration](/message/). The table below summarizes the most commonly used fields.
+MailComposer 接受与 Nodemailer [消息配置](/message/) 相同的消息选项。下表总结了最常用的字段。
 
-| Field                 | Description                                                                                                                                                                                                                    |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **from**              | The sender's email address. You can use a plain address (`'sender@server.com'`) or include a display name (`'Sender Name <sender@server.com>'`). See [Address formatting](#address-formatting) for all supported formats.     |
-| **sender**            | The email address that appears in the _Sender:_ header. Use this when the person sending the message differs from the author listed in _From:_.                                                                                |
-| **to**                | Primary recipients. Accepts a comma-separated string or an array of addresses.                                                                                                                                                 |
-| **cc**                | Carbon-copy recipients. These addresses receive a copy of the message and are visible to all recipients.                                                                                                                       |
-| **bcc**               | Blind carbon-copy recipients. These addresses receive a copy but are hidden from other recipients. See [BCC](#bcc) for information about header visibility.                                                                    |
-| **replyTo**           | The address where replies should be sent. This populates the _Reply-To:_ header.                                                                                                                                               |
-| **inReplyTo**         | The `Message-ID` of the email this message is replying to. Used by email clients to thread conversations.                                                                                                                      |
-| **references**        | A list of related `Message-ID` values for conversation threading. Accepts a space-separated string or an array.                                                                                                                |
-| **subject**           | The subject line of the message.                                                                                                                                                                                               |
-| **text**              | The plain-text version of the message body. Accepts a `string`, `Buffer`, `Stream`, or an object like `{ path: '/path/to/file.txt' }`.                                                                                         |
-| **html**              | The HTML version of the message body. Accepts the same input formats as **text**.                                                                                                                                              |
-| **watchHtml**         | HTML content specifically for Apple Watch. Most modern smartwatches now render standard `text/html`, so this field is rarely needed.                                                                                           |
-| **amp**               | AMP4EMAIL content for interactive emails. Must be a complete, valid AMP document. Email clients that cannot render AMP will display the **html** version instead. [Learn more about AMP emails](https://blog.nodemailer.com/2019/12/30/testing-amp4email-with-nodemailer/). |
-| **icalEvent**         | An iCalendar event to include with the message. Accepts the same input formats as **text**/**html**. To specify the calendar method, use an object: `{ method: 'REQUEST', content: icsString }`. The default method is `PUBLISH`. Content must be UTF-8 encoded. |
-| **headers**           | Additional email headers. Accepts an object (`{ 'X-Custom-Header': 'value' }`) or an array (`[{ key: 'X-Custom-Header', value: 'value' }]`).                                                                                   |
-| **attachments**       | An array of files to attach to the message. See [Attachments](#attachments) below, or the main [attachments documentation](/message/attachments) for additional examples.                                                 |
-| **alternatives**      | An array of alternative content versions to include in a `multipart/alternative` section. See [Alternatives](#alternatives) for details.                                                                                       |
-| **envelope**          | A custom SMTP envelope that overrides the addresses derived from headers. See [SMTP envelope](#smtp-envelope).                                                                                                                 |
-| **messageId**         | A custom `Message-ID` value. If omitted, one is generated automatically.                                                                                                                                                       |
-| **date**              | A custom date for the `Date` header. Defaults to the current UTC time.                                                                                                                                                         |
-| **encoding**          | The transfer encoding to use for text parts (such as `quoted-printable` or `base64`).                                                                                                                                          |
-| **raw**               | Provide a pre-built raw message instead of having MailComposer generate one. When using this option, you must set headers and envelope manually. See [custom source](/message/custom-source) for more details.            |
-| **textEncoding**      | Force a specific encoding for text parts: `quoted-printable` or `base64`. If omitted, the encoding is detected automatically based on the content.                                                                             |
-| **disableUrlAccess**  | When set to `true`, MailComposer will throw an error if any part of the message tries to fetch content from a URL.                                                                                                             |
-| **disableFileAccess** | When set to `true`, MailComposer will throw an error if any part of the message tries to read content from the file system.                                                                                                    |
-| **newline**           | The line break style to use in the generated message. Valid values are `\r\n` (CRLF), `\n` (LF), or leave undefined to preserve the line breaks from your input.                                                               |
+| 字段                   | 描述                                                                                                                                                                                                                        |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **from**               | 发件人电子邮件地址。可以是纯地址（`'sender@server.com'`）或包含显示名称（`'Sender Name <sender@server.com>'`）。详见 [地址格式](#地址格式)。                                                                             |
+| **sender**             | 出现在 _Sender:_ 头部的电子邮件地址。当发送消息的人与 _From:_ 所列作者不同，使用此字段。                                                                                                                                      |
+| **to**                 | 主要收件人。可用逗号分隔字符串或地址数组。                                                                                                                                                                                |
+| **cc**                 | 抄送收件人。这些地址会收到消息副本，且对所有收件人可见。                                                                                                                                                                  |
+| **bcc**                | 密送收件人。该地址会收到副本，但对其他收件人隐藏。有关头部可见性，请参见 [BCC](#bcc) 。                                                                                                                                      |
+| **replyTo**            | 回复应发送的地址，设置 _Reply-To:_ 头部。                                                                                                                                                                                  |
+| **inReplyTo**          | 该邮件回复的电子邮件的 `Message-ID`，邮件客户端用来对话线程排序。                                                                                                                                                           |
+| **references**         | 对话线程的相关 `Message-ID` 列表。支持空格分隔字符串或数组。                                                                                                                                                               |
+| **subject**            | 邮件主题。                                                                                                                                                                                                                 |
+| **text**               | 邮件正文的纯文本版本。支持 `string`、`Buffer`、`Stream` 或 `{ path: '/path/to/file.txt' }` 等对象。                                                                                                                        |
+| **html**               | 邮件正文的 HTML 版本。支持与 **text** 相同的输入格式。                                                                                                                                                                    |
+| **watchHtml**          | 专为 Apple Watch 设计的 HTML 内容。现代智能手表一般支持标准 `text/html`，所以此字段用得较少。                                                                                                                             |
+| **amp**                | AMP4EMAIL 交互邮件内容，必须是完整且有效的 AMP 文档。不支持 AMP 的客户端将显示 **html** 内容。具体见[了解更多 AMP 邮件](https://blog.nodemailer.com/2019/12/30/testing-amp4email-with-nodemailer/)。                          |
+| **icalEvent**          | 包含的 iCalendar 事件。输入格式可同 **text**/**html**。设置日历方法格式为 `{ method: 'REQUEST', content: icsString }` 对象形式，默认方法为 `PUBLISH`。内容须为 UTF-8 编码。                                              |
+| **headers**            | 额外的邮件头。可接受对象格式（`{ 'X-Custom-Header': 'value' }`）或数组格式（`[{ key: 'X-Custom-Header', value: 'value' }]`）。                                                                                             |
+| **attachments**        | 附加文件数组。详见下文的 [附件](#附件) 或主文档中 [attachments documentation](/message/attachments) 以获取更多示例。                                                                                                     |
+| **alternatives**       | 包含在 `multipart/alternative` 部分的替代内容版本数组，详见 [替代内容](#替代内容) 。                                                                                                                                         |
+| **envelope**           | 自定义的 SMTP 信封，覆盖从头部推断出的地址。详见 [SMTP 信封](#smtp-envelope) 。                                                                                                                                             |
+| **messageId**          | 自定义 `Message-ID`，未指定时自动生成。                                                                                                                                                                                    |
+| **date**               | 自定义 `Date` 头部时间，默认为当前 UTC 时间。                                                                                                                                                                              |
+| **encoding**           | 文本部分使用的传输编码（例如 `quoted-printable` 或 `base64`）。                                                                                                                                                            |
+| **raw**                | 提供预构建的原始消息，替代 MailComposer 生成。当使用此选项时，必须手动设置头部和信封。具体见 [自定义源](/message/custom-source) 。                                                                                     |
+| **textEncoding**       | 强制文本部分使用的编码：`quoted-printable` 或 `base64`。若省略，则根据内容自动检测。                                                                                                                                       |
+| **disableUrlAccess**   | 设置为 `true` 时，如果消息部分尝试从 URL 拉取内容，MailComposer 会抛出错误。                                                                                                                                               |
+| **disableFileAccess**  | 设置为 `true` 时，如果消息部分尝试读取文件系统内容，MailComposer 会抛出错误。                                                                                                                                               |
+| **newline**            | 生成消息使用的换行符样式。有效值为 `\r\n`（CRLF）、`\n`（LF），若不设置则保留输入中的换行格式。                                                                                                                           |
 
-All text content is treated as UTF-8. Attachments are streamed as binary data.
+所有文本内容均视为 UTF-8 编码。附件以二进制流方式传输。
 
 ---
 
-## Attachments
+## 附件
 
-Each attachment is defined as an object with the following properties:
+每个附件通过对象定义，属性如下：
 
-| Property                    | Description                                                                                                                                                                               |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **filename**                | The file name shown to recipients. Unicode characters are allowed. Set to `false` to omit the filename entirely.                                                                          |
-| **cid**                     | A Content-ID for embedding the attachment inline (used with `cid:` URLs in HTML). When you set **cid**, the attachment automatically uses `contentDisposition: 'inline'` and is placed in the `multipart/related` section. |
-| **content**                 | The attachment data as a `string`, `Buffer`, or readable `Stream`.                                                                                                                        |
-| **encoding**                | The encoding used to convert a string **content** into a Buffer. Common values include `base64` and `hex`.                                                                                |
-| **path**                    | A file path or URL to stream content from, instead of providing data directly via **content**. Supports local file paths, HTTP/HTTPS URLs, and data URIs. Ideal for large files.         |
-| **contentType**             | The MIME type of the attachment. If omitted, it is detected automatically from the **filename** or **path**.                                                                              |
-| **contentTransferEncoding** | The transfer encoding for this attachment (`quoted-printable`, `base64`, etc.). If omitted, it is detected automatically.                                                                 |
-| **contentDisposition**      | How the attachment should be presented: `attachment` (the default, shown as a downloadable file) or `inline` (displayed within the message body).                                         |
-| **headers**                 | Additional headers for this MIME part, for example: `{ 'X-Custom-Header': 'value' }`.                                                                                                     |
-| **raw**                     | Provide pre-built raw MIME content for this part. When set, all other attachment options are ignored. Accepts a `string`, `Buffer`, `Stream`, or another attachment-like object.          |
+| 属性                       | 描述                                                                                                                                                                                                                       |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **filename**               | 显示给收件人的文件名，支持 Unicode 字符。设为 `false` 可完全省略文件名。                                                                                                                                                     |
+| **cid**                    | 用于内嵌附件的 Content-ID（HTML 中用 `cid:` URL 引用）。设置后，附件自动使用 `contentDisposition: 'inline'` 并归入 `multipart/related` 部分。                                                                                |
+| **content**                | 附件内容，可为 `string`、`Buffer` 或可读流 `Stream`。                                                                                                                                                                     |
+| **encoding**               | 用于将字符串内容转为 Buffer 的编码方式，常用如 `base64`、`hex`。                                                                                                                                                           |
+| **path**                   | 以文件路径或 URL 流式读取内容，替代直接传入内容。支持本地文件路径、HTTP/HTTPS URL 和数据 URI，适合大型文件。                                                                                                              |
+| **contentType**            | 附件的 MIME 类型。未指定时会从文件名或路径自动检测。                                                                                                                                                                      |
+| **contentTransferEncoding**| 此附件的传输编码（如 `quoted-printable`、`base64` 等）。未指定时自动检测。                                                                                                                                                 |
+| **contentDisposition**     | 附件的呈现方式：`attachment`（默认，作为可下载文件）或 `inline`（内嵌于邮件正文中）。                                                                                                                                      |
+| **headers**                | 此 MIME 部分的附加头部，例如 `{ 'X-Custom-Header': 'value' }`。                                                                                                                                                           |
+| **raw**                    | 提供预构建的原始 MIME 内容，设置后忽略其他附件选项。可用 `string`、`Buffer`、`Stream` 或类似附件的对象。                                                                                                                |
 
-### Example
+### 示例
 
 ```js
 const fs = require("fs");
 
 const mailOptions = {
-  // ...other fields...
+  // ...其他字段...
   attachments: [
-    // Plain text string as attachment content
+    // 文本字符串作为附件内容
     { filename: "hello.txt", content: "hello world!" },
 
-    // Binary Buffer as attachment content
+    // 二进制 Buffer 作为附件内容
     { filename: "buffer.txt", content: Buffer.from("hello world!", "utf-8") },
 
-    // Stream content from a file on disk
+    // 从磁盘文件流读取内容
     { filename: "file.txt", path: "/path/to/file.txt" },
 
-    // Let filename and content type be inferred from the path
+    // 让文件名和 MIME 类型从路径推断
     { path: "/path/to/logo.png" },
 
-    // Use a readable stream as the content source
+    // 使用可读取流作为内容源
     { filename: "stream.txt", content: fs.createReadStream("file.txt") },
 
-    // Explicitly set the content type
+    // 显式设置内容类型
     { filename: "data.bin", content: "hello world!", contentType: "application/octet-stream" },
 
-    // Fetch attachment content from a remote URL
+    // 从远程 URL 获取附件内容
     { filename: "license.txt", path: "https://raw.githubusercontent.com/nodemailer/nodemailer/master/LICENSE" },
 
-    // Decode a base64-encoded string into attachment content
+    // 解码 base64 字符串为附件内容
     { filename: "base64.txt", content: "aGVsbG8gd29ybGQh", encoding: "base64" },
 
-    // Use a data URI as the content source
+    // 使用 data URI 作为内容源
     { path: "data:text/plain;base64,aGVsbG8gd29ybGQ=" },
   ],
 };
@@ -156,11 +156,11 @@ const mailOptions = {
 
 ---
 
-## Alternatives
+## 替代内容
 
-In addition to **text** and **html**, you can include other versions of your message content as _alternatives_. For example, you might include a Markdown version or an OpenDocument version of the same content. The recipient's email client will choose the most appropriate version to display.
+除了 **text** 和 **html**，你还可以将其他版本的消息内容作为 _alternatives_（替代版本）包含。例如，你可能包含同一内容的 Markdown 或 OpenDocument 版本。邮件客户端会根据情况选择合适版本显示。
 
-Alternative objects use the same properties as [attachments](#attachments), but they are placed in the `multipart/alternative` section of the message rather than the `multipart/mixed` or `multipart/related` sections.
+替代内容对象使用与[附件](#附件)相同的属性，但放在消息的 `multipart/alternative` 部分，而非 `multipart/mixed` 或 `multipart/related`。
 
 ```js
 const mailOptions = {
@@ -176,18 +176,18 @@ const mailOptions = {
 
 ---
 
-## Address formatting
+## 地址格式
 
-Email addresses can be specified in several formats:
+电子邮件地址可通过多种格式指定：
 
-**As a string:**
+**字符串形式：**
 
 ```
 recipient@example.com
 "Display Name" <recipient@example.com>
 ```
 
-**As an object** (useful when the display name contains special characters):
+**对象形式**（当显示名称含特殊字符时更适用）：
 
 ```js
 {
@@ -196,7 +196,7 @@ recipient@example.com
 }
 ```
 
-All address fields (including **from**) accept one or more addresses. You can mix and match formats freely:
+所有地址字段（包括 **from**）均支持一个或多个地址，且可以自由混合格式：
 
 ```js
 {
@@ -209,20 +209,20 @@ All address fields (including **from**) accept one or more addresses. You can mi
 }
 ```
 
-Internationalized domain names (IDN) are automatically converted to their ASCII-compatible encoding (punycode):
+国际化域名（IDN）会自动转换为 ASCII 兼容编码（punycode）：
 
 ```
 "Андрис" <андрис@уайлддак.орг>
-// Domain converts to punycode: андрис@xn--80aalaxjd5d.xn--c1avg
+// 域名转换为 punycode：андрис@xn--80aalaxjd5d.xn--c1avg
 ```
 
-Note that email addresses with non-ASCII usernames (the part before `@`) require the receiving server to support the SMTPUTF8 extension.
+注意，非 ASCII 用户名部分（@ 前）需要接收服务器支持 SMTPUTF8 扩展。
 
 ---
 
-## SMTP envelope
+## SMTP 信封
 
-By default, the SMTP envelope (the actual routing information used by mail servers) is derived from the address headers in your message. If you need different envelope addresses - for example, to implement VERP (Variable Envelope Return Path) or to use a null return path - you can specify them explicitly:
+默认情况下，SMTP 信封（邮件服务器实际使用的路由信息）从邮件头地址中推断得出。如果需要不同的信封地址，比如实现 VERP（Variable Envelope Return Path）或使用空返回路径，则可以显式指定：
 
 ```js
 const mailOptions = {
@@ -236,14 +236,14 @@ const mailOptions = {
 ```
 
 :::note
-Some transports (such as AWS SES) ignore the `envelope` option and use the header addresses instead.
+部分传输插件（如 AWS SES）会忽略 `envelope` 选项，改用头部地址。
 :::
 
 ---
 
-## Using embedded images
+## 使用嵌入图片
 
-To embed an image directly in your HTML content, assign a unique `cid` (Content-ID) to the attachment and reference it using the `cid:` protocol in your HTML:
+要在 HTML 内容中直接嵌入图片，给附件设置唯一 `cid`（Content-ID），并在 HTML 中通过 `cid:` 协议引用：
 
 ```js
 const mailOptions = {
@@ -252,7 +252,7 @@ const mailOptions = {
     {
       filename: "image.png",
       path: "/path/to/image.png",
-      cid: "unique@nodemailer", // This value must match the src attribute
+      cid: "unique@nodemailer", // 必须与 src 属性值匹配
     },
   ],
 };
@@ -262,13 +262,13 @@ const mailOptions = {
 
 ## BCC
 
-For privacy protection, MailComposer removes the _Bcc:_ header from the generated message by default. This ensures that blind carbon-copy recipients remain hidden from other recipients.
+为了保护隐私，MailComposer 默认会从生成的消息中移除 _Bcc:_ 头部，确保密送收件人对其他收件人不可见。
 
-If you need the _Bcc:_ header to remain in the generated message (for example, when archiving messages), you can enable `keepBcc` on the compiled message object:
+如果需要在生成的消息中保留 _Bcc:_ 头部（例如归档消息时），可以在编译后的消息对象上启用 `keepBcc`：
 
 ```js
 const mail = new MailComposer({
-  // ...message options...
+  // ...消息选项...
   bcc: "bcc@example.com",
 }).compile();
 
@@ -282,6 +282,6 @@ mail.build((err, message) => {
 
 ---
 
-## License
+## 许可证
 
 [MIT](https://github.com/nodemailer/nodemailer/blob/master/LICENSE)

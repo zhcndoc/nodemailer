@@ -1,71 +1,71 @@
 ---
-title: Sendmail transport
+title: Sendmail 传输
 sidebar_position: 27
-description: Pipe generated RFC 822 messages to local sendmail or compatible binary.
+description: 将生成的 RFC 822 消息通过管道传递给本地 sendmail 或兼容二进制文件。
 ---
 
-The **Sendmail transport** delivers email by passing the generated RFC 822 message to the local **sendmail** command (or a compatible mail transfer agent such as Postfix or Exim). The message is piped directly to the program's standard input. This is the same mechanism used by PHP's `mail()` function.
+**Sendmail 传输**通过将生成的 RFC 822 邮件消息传递给本地的 **sendmail** 命令（或类似的邮件传输代理，如 Postfix 或 Exim）来发送邮件。消息会直接通过管道传入该程序的标准输入。这与 PHP 的 `mail()` 函数所使用的机制相同。
 
-## Usage
+## 用法
 
 ```javascript
 // CommonJS
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  sendmail: true, // enable Sendmail transport
+  sendmail: true, // 启用 Sendmail 传输
 });
 ```
 
-Setting `sendmail: true` activates the Sendmail transport. Nodemailer looks for a `sendmail` executable in your system's `PATH` by default. If your sendmail binary is located elsewhere, you can specify the full path using the `path` option described below.
+设置 `sendmail: true` 即激活 Sendmail 传输。Nodemailer 默认会在系统的 `PATH` 中查找 `sendmail` 可执行文件。如果你的 sendmail 二进制文件位于其它位置，可以使用下面介绍的 `path` 选项指定完整路径。
 
-### Transport options
+### 传输选项
 
-| Option    | Type                   | Default      | Description                                                                                                                                                                                                                                                                            |
-| --------- | ---------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `path`    | `String`               | `'sendmail'` | Path to the **sendmail** binary. Can be an absolute path (e.g., `/usr/sbin/sendmail`) or just the executable name if it is in your `PATH`.                                                                                                                                            |
-| `newline` | `'unix'` / `'windows'` | `'unix'`     | Line ending style for the generated message. Use `'unix'` for `\n` (LF) or `'windows'` for `\r\n` (CRLF). Most systems work fine with the default `'unix'` setting.                                                                                                                   |
-| `args`    | `String[]`             | _none_       | Custom command-line arguments for the sendmail binary. When you provide this array, it replaces Nodemailer's default arguments **except** for `-i` (which is always included) and the recipient addresses (which are always appended). See the examples below for common use cases. |
+| 选项       | 类型                    | 默认值        | 说明                                                                                                                                                                                                                  |
+| ---------- | ----------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`     | `String`                | `'sendmail'`  | **sendmail** 二进制文件的路径。可以是绝对路径（例如 `/usr/sbin/sendmail`），或者如果该可执行文件在你的 `PATH` 中，则仅需写文件名。                                                                                        |
+| `newline`  | `'unix'` / `'windows'`  | `'unix'`      | 生成消息的换行风格。`'unix'` 表示使用 `\n`（换行符，LF），`'windows'` 表示使用 `\r\n`（回车换行符，CRLF）。大多数系统使用默认的 `'unix'` 即可正常工作。                                                                  |
+| `args`     | `String[]`              | _无_          | 用于 sendmail 二进制文件的自定义命令行参数。当你提供此数组时，它会替代 Nodemailer 默认的参数，**除了** `-i`（始终包含）和收件人地址（始终追加）。常见用法请参考下方示例。                                                   |
 
-When no custom `args` array is provided, Nodemailer executes the following command:
+如果没有提供自定义的 `args` 数组，Nodemailer 会执行如下命令：
 
 ```sh
 sendmail -i -f <from> <to...>
 ```
 
-When you provide a custom `args` array, the command becomes:
+当提供自定义的 `args` 数组时，命令将变为：
 
 ```sh
 sendmail -i <args...> <to...>
 ```
 
-Note that the `-i` flag (which prevents a single dot on a line from being treated as the end of the message) and the recipient list are always included automatically.
+请注意，`-i` 参数（防止单独一行中只出现一个点时被识别为邮件结束）以及收件人列表总是会自动包含。
 
-### Response
+### 返回结果
 
-After successfully sending a message, `transporter.sendMail()` resolves with an `info` object containing the following properties:
+发送成功后，`transporter.sendMail()` 会返回一个 `info` 对象，包含以下属性：
 
-- `envelope` - An object with `from` (string) and `to` (array of strings) properties representing the message [envelope](../smtp/envelope)
-- `messageId` - The generated Message-ID header value for the sent message
-- `response` - The string `'Messages queued for delivery'`
+- `envelope` - 一个对象，含有 `from`（字符串）和 `to`（字符串数组）属性，表示邮件的[信封信息](../smtp/envelope)
+- `messageId` - 发送的邮件所生成的 Message-ID 头部值
+- `response` - 字符串 `'Messages queued for delivery'`
 
-Note that the sendmail command does not produce output, so the `response` is a static confirmation message from Nodemailer.
+请注意，sendmail 命令本身不产生输出，因此 `response` 是来自 Nodemailer 的固定确认信息。
 
-### Troubleshooting
+### 故障排查
 
-If Nodemailer cannot find the sendmail binary, you will receive an error with exit code 127. To resolve this:
+如果 Nodemailer 找不到 sendmail 二进制文件，则会返回退出码 127 的错误。解决方法：
 
-1. Verify that sendmail (or a compatible MTA like Postfix) is installed on your system
-2. Check that the binary is accessible via your `PATH`, or specify the full path using the `path` option
-3. Common locations include `/usr/sbin/sendmail` and `/usr/lib/sendmail`
+1. 确认系统中已安装 sendmail（或兼容的 MTA，如 Postfix）
+2. 检查二进制文件是否在你的 `PATH` 中，或者通过 `path` 选项指定完整路径
+3. 常见位置包括 `/usr/sbin/sendmail` 和 `/usr/lib/sendmail`
 
-For installation instructions, consult your operating system's documentation or the [Computer Hope sendmail reference](https://www.computerhope.com/unix/usendmai.htm).
+安装说明请参考你的操作系统文档或 [Computer Hope sendmail 参考](https://www.computerhope.com/unix/usendmai.htm)。
 
-### Examples
+### 示例
 
-#### Specifying a custom binary path
+#### 指定自定义二进制路径
 
-Use the `path` option when the sendmail binary is not in your `PATH` or you want to use a specific location:
+如果 sendmail 不在你的 `PATH` 中，或者想使用特定路径，可以使用 `path` 选项：
 
 ```javascript
 const nodemailer = require("nodemailer");
@@ -80,8 +80,8 @@ transporter.sendMail(
   {
     from: "sender@example.com",
     to: "recipient@example.com",
-    subject: "Test message",
-    text: "I hope this message gets delivered!",
+    subject: "测试邮件",
+    text: "希望这条消息能够成功发送！",
   },
   (err, info) => {
     if (err) {
@@ -94,9 +94,9 @@ transporter.sendMail(
 );
 ```
 
-#### Passing custom command-line arguments
+#### 传递自定义命令行参数
 
-Use the `args` option to pass additional flags to the sendmail binary. For example, to override the [envelope](../smtp/envelope) sender address (useful for setting a custom bounce address):
+使用 `args` 选项为 sendmail 二进制传递额外标志。例如，覆盖[信封](../smtp/envelope)发件人地址（通常用于设置自定义退信地址）：
 
 ```javascript
 const transporter = nodemailer.createTransport({
@@ -105,4 +105,4 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-When using `args`, remember that you are replacing Nodemailer's default arguments. If you need the `-f` flag for the envelope sender, you must include it explicitly as shown above.
+使用 `args` 时请记住，你是替换了 Nodemailer 的默认参数。如果你需要 `-f` 标志指定信封发件人，必须显式包含它，如上所示。

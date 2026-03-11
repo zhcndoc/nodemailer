@@ -1,33 +1,33 @@
 ---
-title: Delivery Status Notifications (DSN)
-description: Request delivery, delay, or failure status notifications for outgoing email messages using the SMTP DSN extension.
+title: 送达状态通知（DSN）
+description: 使用 SMTP DSN 扩展请求外发邮件的送达、延迟或失败状态通知。
 sidebar_position: 26
 ---
 
 :::info
-The SMTP **Delivery Status Notification** (DSN) extension (defined in [RFC 3461](https://datatracker.ietf.org/doc/html/rfc3461)) is **optional**. Your SMTP server must advertise DSN support in its `EHLO` response for these options to have any effect.
+SMTP **送达状态通知**（DSN）扩展（定义于 [RFC 3461](https://datatracker.ietf.org/doc/html/rfc3461)）是**可选的**。您的 SMTP 服务器必须在其 `EHLO` 响应中声明支持 DSN，相关选项才能生效。
 :::
 
-Delivery Status Notifications allow you to receive automatic email reports about what happens to your messages after they leave your server. You can request notifications when a message is successfully delivered, when delivery is delayed, or when delivery fails permanently (bounces).
+送达状态通知允许您自动接收关于邮件离开您的服务器后发生的情况的邮件报告。您可以请求在邮件成功送达、投递延迟或永久失败（退信）时收到通知。
 
-To request DSN for a message, add a **`dsn`** object to your [message configuration](/message/) when calling `transporter.sendMail()`.
+要为某条消息请求 DSN，请在调用 `transporter.sendMail()` 时，在[消息配置](/message/)中添加一个 **`dsn`** 对象。
 
-## `dsn` object fields
+## `dsn` 对象字段
 
-| Property    | Type                  | Description                                                                                                                                                                          | Corresponding SMTP keyword |
-| ----------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- |
-| `id`        | `string`              | A unique identifier for this message that will be included in any DSN reports you receive. This helps you match notifications back to the original message.                         | **ENVID**                  |
-| `return`    | `'headers' \| 'full'` | Controls how much of the original message is included in the DSN. Use `'headers'` to include only the message headers, or `'full'` to include the complete original message.        | **RET**                    |
-| `notify`    | `string \| string[]`  | Specifies which events should trigger a notification. Valid values are `'success'`, `'failure'`, `'delay'`, or `'never'`. You can combine multiple values (except `'never'`, which must be used alone). | **NOTIFY**                 |
-| `recipient` | `string`              | The original recipient address to include in the DSN. Nodemailer automatically formats this with the required `rfc822;` prefix if not provided.                                     | **ORCPT**                  |
+| 属性       | 类型                   | 描述                                                                                                                                                                             | 对应的 SMTP 关键字          |
+| ---------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `id`       | `string`               | 此消息的唯一标识符，将包含在您收到的任何 DSN 报告中。它帮助您将通知与原始消息匹配。                                                                                              | **ENVID**                   |
+| `return`   | `'headers' \| 'full'`  | 控制在 DSN 中包含多少原始邮件内容。使用 `'headers'` 仅包含邮件头，使用 `'full'` 包含完整的原始邮件内容。                                                                          | **RET**                     |
+| `notify`   | `string \| string[]`   | 指定哪些事件应触发通知。有效值为 `'success'`、`'failure'`、`'delay'` 或 `'never'`。您可以合并多个值（除了 `'never'`，它必须单独使用）。                                               | **NOTIFY**                  |
+| `recipient`| `string`               | 在 DSN 中包含的原始收件人地址。如果未提供，Nodemailer 会自动按照要求添加 `rfc822;` 前缀进行格式化。                                                                             | **ORCPT**                   |
 
-> Nodemailer automatically escapes special characters in DSN values according to the [xtext](https://datatracker.ietf.org/doc/html/rfc3461#section-4) encoding rules defined in RFC 3461.
+> Nodemailer 会根据 RFC 3461 中定义的 [xtext](https://datatracker.ietf.org/doc/html/rfc3461#section-4) 编码规则自动转义 DSN 值中的特殊字符。
 
-## Examples
+## 示例
 
-### 1. Request a notification when the message is delivered
+### 1. 请求当邮件成功送达时通知
 
-This example requests a success notification, so you will receive an email confirmation when the recipient's mail server accepts the message for final delivery.
+此示例请求成功通知，您将在收件方邮件服务器接受邮件进行最终投递时收到邮件确认。
 
 ```javascript
 const nodemailer = require("nodemailer");
@@ -56,9 +56,9 @@ await transporter.sendMail({
 });
 ```
 
-### 2. Request notifications for failures and delays
+### 2. 请求失败和延迟通知
 
-This example requests notifications for both permanent failures (bounces) and temporary delays. This is useful when you want to be alerted if something goes wrong but do not need confirmation of successful delivery.
+此示例请求永久失败（退信）和临时延迟的通知。当您希望在出现问题时获得提醒，但不需要成功投递确认时，此方式很有用。
 
 ```javascript
 await transporter.sendMail({
@@ -75,20 +75,20 @@ await transporter.sendMail({
 });
 ```
 
-### 3. Disable DSN reports entirely
+### 3. 完全禁用 DSN 报告
 
-If you explicitly do **not** want to receive any DSN reports for a message, set `notify` to `'never'`. This tells the receiving server that you do not want notifications under any circumstances.
+如果您明确**不希望**为某条消息接收任何 DSN 报告，请将 `notify` 设置为 `'never'`。这会告诉接收服务器无论如何都不发送通知。
 
 ```javascript
 await transporter.sendMail({
-  /* ... other message options ... */
+  /* ... 其他邮件选项 ... */
   dsn: {
     notify: "never",
   },
 });
 ```
 
-## Troubleshooting
+## 故障排除
 
-- **Not receiving DSN reports?** Verify that your [SMTP server](./index.md) supports the DSN extension by checking its `EHLO` response. The server must list `DSN` as one of its supported extensions. Also ensure you are not forcing a downgrade to the legacy `HELO` command, which does not support extensions.
-- **Incomplete or missing information in reports?** Some email service providers only support a subset of DSN options or may modify certain values. Check your provider's documentation for any limitations or provider-specific behavior.
+- **未收到 DSN 报告？** 请确认您的[SMTP 服务器](./index.md)支持 DSN 扩展，检查其 `EHLO` 响应中是否列出了 `DSN` 支持。并确保未强制降级到不支持扩展的传统 `HELO` 命令。
+- **报告中信息不完整或缺失？** 某些邮件服务商只支持部分 DSN 选项，或可能修改某些值。请查看服务商文档，了解其限制或特定行为。

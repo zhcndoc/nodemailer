@@ -1,68 +1,68 @@
 ---
-title: Create plugins
+title: 创建插件
 sidebar_position: 30
-description: Write custom plugins for message pre-processing, stream transformation, or transport.
+description: 编写自定义插件以进行消息预处理、流转换或传输处理。
 ---
 
-Nodemailer provides three extension points in the email delivery pipeline where you can attach [plugins](./index.md) to customize behavior:
+Nodemailer 在邮件发送流程中提供了三个扩展点，你可以在这些点附加[插件](./index.md)来定制行为：
 
-1. **`compile`** - Runs immediately after `sendMail()` is called, before Nodemailer builds the MIME tree. Use this stage to modify `mail.data` (for example, to transform HTML content, add custom headers, or set default values).
-2. **`stream`** - Runs after the MIME tree is fully constructed but before the message bytes are streamed out. At this stage you can modify the `mail.message` object directly or insert transform streams to process the raw message data.
-3. **Transport** - The final stage where the raw message stream is delivered to its destination. Custom [transports](/transports/) implement this stage to define how messages are actually sent.
+1. **`compile`** - 在调用 `sendMail()` 后立即运行，之前 Nodemailer 会构建 MIME 树。此阶段可用来修改 `mail.data`（例如转换 HTML 内容、添加自定义头部，或设置默认值）。
+2. **`stream`** - 在 MIME 树完全构建后但在消息字节流传输之前运行。此阶段可直接修改 `mail.message` 对象，或插入转换流来处理原始消息数据。
+3. **传输（Transport）** - 最终阶段，原始消息流被发送到目的地。自定义[传输](/transports/)通过实现此阶段决定消息的实际发送方式。
 
 ---
 
-## Attaching `compile` and `stream` plugins
+## 附加 `compile` 和 `stream` 插件
 
-To register a plugin, call the `use()` method on your transporter:
+要注册插件，调用传输器的 `use()` 方法：
 
 ```javascript
 transporter.use(step, pluginFn);
 ```
 
-| Parameter     | Type                   | Description                                                        |
-| ------------- | ---------------------- | ------------------------------------------------------------------ |
-| `transporter` | `Object`               | A transporter instance created with `nodemailer.createTransport()` |
-| `step`        | `String`               | The pipeline stage: either `'compile'` or `'stream'`               |
-| `pluginFn`    | `Function(mail, done)` | Your plugin function (see the Plugin API section below)            |
+| 参数         | 类型                    | 说明                                                              |
+| ------------ | ----------------------- | ----------------------------------------------------------------- |
+| `transporter` | `Object`                | 使用 `nodemailer.createTransport()` 创建的传输器实例             |
+| `step`       | `String`                | 管道阶段： `'compile'` 或 `'stream'`                             |
+| `pluginFn`   | `Function(mail, done)`  | 你的插件函数（见下文插件 API 部分）                              |
 
-You can register multiple plugins for the same stage. They will execute in the order they were added.
+同一阶段可以注册多个插件，它们会按照添加顺序依次执行。
 
 ---
 
-## Plugin API
+## 插件 API
 
-Every plugin function, including custom transport `send` methods, receives two arguments:
+所有插件函数，包括自定义传输的 `send` 方法，都接收两个参数：
 
-1. **`mail`** - An object containing information about the message being processed (see the table below).
-2. **`done`** - A callback function with the signature `function(err)`. You **must** call this when your plugin finishes. Pass an `Error` object to abort the send operation, or call it with no arguments to continue processing.
+1. **`mail`** - 一个包含当前处理消息信息的对象（详见下表）。
+2. **`done`** - 回调函数，签名为 `function(err)`。插件完成时**必须**调用它。传入 `Error` 对象可中止发送操作，不传参数则继续后续处理。
 
-### The `mail` object
+### `mail` 对象
 
-| Property         | Available at                       | Description                                                                                                                     |
-| ---------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `data`           | `compile`, `stream`, **transport** | The original options object passed to `sendMail()`                                                                              |
-| `message`        | `stream`, **transport**            | A [`MimeNode`](https://github.com/nodemailer/nodemailer/blob/master/lib/mime-node/index.js) instance representing the built message (see also [MailComposer](/extras/mailcomposer/)) |
-| `resolveContent` | `compile`, `stream`, **transport** | A helper method for converting Nodemailer content objects (streams, file paths, URLs) into a `String` or `Buffer`              |
+| 属性              | 可用阶段                       | 说明                                                                                                                        |
+| ----------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `data`            | `compile`，`stream`，**传输**  | 原始的传递给 `sendMail()` 的选项对象                                                                                         |
+| `message`         | `stream`，**传输**             | 一个 [`MimeNode`](https://github.com/nodemailer/nodemailer/blob/master/lib/mime-node/index.js) 实例，代表已构建的消息（参见[MailComposer](/extras/mailcomposer/)） |
+| `resolveContent`  | `compile`，`stream`，**传输**  | 辅助方法，将 Nodemailer 内容对象（流、文件路径、URL 等）转换为 `String` 或 `Buffer`                                         |
 
 ### `mail.resolveContent(obj, key, callback)`
 
-Use this method to convert any [Nodemailer content type](https://nodemailer.com/message/attachments/#possible-content-types) (file path, URL, Stream, Buffer, etc.) into a plain `String` or `Buffer`. This is useful when you need to read and process content that might come from various sources.
+使用此方法将任意 [Nodemailer 内容类型](https://nodemailer.com/message/attachments/#possible-content-types)（文件路径、URL、流、Buffer 等）转换为纯 `String` 或 `Buffer`。当你需要读取和处理来自多种来源的内容时非常有用。
 
 ```javascript
 mail.resolveContent(sourceObject, propertyName, (err, value) => {
   if (err) return done(err);
-  // value is a String or Buffer depending on the input type
+  // value 根据输入类型是 String 或 Buffer
 });
 ```
 
-#### Example: Log the final HTML string
+#### 示例：记录最终的 HTML 字符串
 
 ```javascript
 function plugin(mail, done) {
   mail.resolveContent(mail.data, "html", (err, html) => {
     if (err) return done(err);
-    console.log("HTML contents: %s", html.toString());
+    console.log("HTML 内容: %s", html.toString());
     done();
   });
 }
@@ -70,11 +70,11 @@ function plugin(mail, done) {
 
 ---
 
-## `compile` plugins
+## `compile` 插件
 
-At the `compile` stage, only `mail.data` is available. The `mail.message` property does **not** exist yet because the MIME tree has not been built. You can freely modify `mail.data` and then call `done()` when finished. Passing an error to `done(err)` will abort the `sendMail()` operation.
+在 `compile` 阶段，仅 `mail.data` 可用。`mail.message` 属性尚不存在，因为 MIME 树尚未构建。你可以自由修改 `mail.data`，完成后调用 `done()`。传入错误 `done(err)` 将中止 `sendMail()` 操作。
 
-#### Example: Generate plain text from HTML if missing
+#### 示例：若缺少纯文本则从 HTML 生成
 
 ```javascript
 transporter.use("compile", (mail, done) => {
@@ -87,18 +87,18 @@ transporter.use("compile", (mail, done) => {
 
 ---
 
-## `stream` plugins
+## `stream` 插件
 
-`stream` plugins run **after** the MIME tree is fully built but **before** any bytes are sent to the transport. At this stage you can:
+`stream` 插件在 MIME 树完全构建后但在任何字节发送给传输之前执行。此阶段你可以：
 
-- Modify `mail.message` directly (for example, to add or change headers)
-- Pipe the output through additional Transform streams using `mail.message.transform()`
+- 直接修改 `mail.message`（比如添加或修改头部）
+- 使用 `mail.message.transform()` 将输出通过附加的转换流
 
 :::note
-Modifying `mail.data` at this stage usually has **no effect** because the MIME tree has already been built from it. The exception is if your custom transport explicitly reads properties from `mail.data`.
+此阶段修改 `mail.data` 通常**无效**，因为 MIME 树已用它构建完成。如自定义传输显式读取 `mail.data` 属性除外。
 :::
 
-### Example: Replace all tabs with spaces in the outgoing stream
+### 示例：将发送流中所有制表符替换为空格
 
 ```javascript
 const { Transform } = require("stream");
@@ -107,7 +107,7 @@ const tabToSpace = new Transform();
 
 tabToSpace._transform = function (chunk, _enc, cb) {
   for (let i = 0; i < chunk.length; ++i) {
-    if (chunk[i] === 0x09) chunk[i] = 0x20; // 0x09 = TAB, 0x20 = space
+    if (chunk[i] === 0x09) chunk[i] = 0x20; // 0x09 = 制表符 TAB，0x20 = 空格
   }
   this.push(chunk);
   cb();
@@ -119,7 +119,7 @@ transporter.use("stream", (mail, done) => {
 });
 ```
 
-### Example: Log all address fields
+### 示例：记录所有地址字段
 
 ```javascript
 transporter.use("stream", (mail, done) => {
@@ -136,36 +136,36 @@ transporter.use("stream", (mail, done) => {
 
 ### `mail.message.transform(transformStream)`
 
-Adds a [`stream.Transform`](https://nodejs.org/api/stream.html#class-streamtransform) through which the raw message is piped **before** it reaches the transport. You can also pass a function that returns a Transform stream.
+添加一个 [`stream.Transform`](https://nodejs.org/api/stream.html#class-streamtransform) 流，经过它后原始消息才会传递给传输器。你也可以传入返回 Transform 流的函数。
 
 ### `mail.message.getAddresses()`
 
-Returns an object containing parsed email addresses from the **From**, **Sender**, **Reply-To**, **To**, **Cc**, and **Bcc** headers. Each property is an **array** of objects with `{ name, address }` structure. If a header is not present in the message, that property will be omitted from the result.
+返回一个对象，包含解析后的 **From**、**Sender**、**Reply-To**、**To**、**Cc** 和 **Bcc** 头部邮件地址。每个属性是一个包含 `{ name, address }` 对象的**数组**。若消息中无该头部，则属性会被省略。
 
 ---
 
-## Writing a custom transport {#transports}
+## 编写自定义传输 {#transports}
 
-A transport is an object that defines how messages are actually delivered. For built-in options, see [SMTP transport](/smtp/) and [other transports](/transports/). To create your own, implement an object with three properties: **`name`**, **`version`**, and a **`send(mail, done)`** method. Pass this object to `nodemailer.createTransport()` to create a working transporter.
+传输是定义消息实际发送方式的对象。内置选项请参阅 [SMTP 传输](/smtp/) 和 [其他传输](/transports/)。要创建自定义传输，实现一个包含三个属性的对象：**`name`**、**`version`** 和一个 **`send(mail, done)`** 方法。将此对象传入 `nodemailer.createTransport()` 创建一个工作传输器。
 
 ```javascript
 const nodemailer = require("nodemailer");
 
 const transport = {
-  name: require("./package.json").name, // e.g. "SMTP"
-  version: require("./package.json").version, // e.g. "1.0.0"
+  name: require("./package.json").name, // 例如 "SMTP"
+  version: require("./package.json").version, // 例如 "1.0.0"
 
   /**
-   * Sends the message.
-   * @param {Object} mail - The same `mail` object that plugins receive
-   * @param {Function} done - Callback with signature `(err, info)`
+   * 发送消息。
+   * @param {Object} mail - 与插件接收的 `mail` 对象相同
+   * @param {Function} done - 回调，签名为 `(err, info)`
    */
   send(mail, done) {
     const input = mail.message.createReadStream();
     const envelope = mail.message.getEnvelope();
     const messageId = mail.message.messageId();
 
-    // For demonstration, we pipe the message to stdout
+    // 示例：将消息流写到标准输出
     input.pipe(process.stdout);
     input.on("end", () => {
       done(null, {
@@ -176,17 +176,16 @@ const transport = {
   },
 
   /**
-   * Optional: Clean up resources when the transporter is closed.
-   * Useful for closing long-lived connections (e.g., pooled SMTP).
+   * 可选：关闭传输器时清理资源。
+   * 用于关闭长连接（例如 SMTP 连接池）。
    */
   close() {
-    // Release resources here
+    // 释放资源
   },
 
   /**
-   * Optional: Report whether the transport is idle.
-   * Used by connection pooling. Return `true` when the transport
-   * has capacity to send more messages immediately.
+   * 可选：报告传输器是否空闲。
+   * 用于连接池。当传输器有能力立即发送更多消息时返回 `true`。
    */
   isIdle() {
     return true;
@@ -208,8 +207,8 @@ transporter.sendMail(
 
 ---
 
-## Summary
+## 总结
 
-1. Choose the stage (`compile`, `stream`, or custom **transport**) that best fits your needs.
-2. Write a plugin function that accepts **`(mail, done)`** and register it with `transporter.use()`, or implement `transport.send()` for a custom transport.
-3. Always call `done()` when your plugin completes. Pass an `Error` to abort the send operation.
+1. 选择最适合你需求的阶段（`compile`，`stream` 或自定义 **传输**）。
+2. 编写接受 **`(mail, done)`** 参数的插件函数，并用 `transporter.use()` 注册，或者为自定义传输实现 `transport.send()`。
+3. 插件执行完毕后**必须**调用 `done()`，传入 `Error` 则中止发送操作。

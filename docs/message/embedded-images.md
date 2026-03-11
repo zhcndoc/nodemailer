@@ -1,28 +1,28 @@
 ---
-title: Embedded images
+title: 嵌入式图片
 sidebar_position: 15
-description: Embed images directly inside HTML body using Content-ID (cid:) URL scheme.
+description: 使用 Content-ID (cid:) URL 方案直接将图片嵌入 HTML 正文中。
 ---
 
-Embedded images are images that display directly in the email body rather than appearing as downloadable attachments. You can embed images in your HTML emails by including them in the [attachments](./attachments) array and referencing them using the `cid:` (Content-ID) URL scheme.
+嵌入式图片是直接显示在电子邮件正文中的图片，而不是作为可下载的附件出现。你可以通过将图片包含在[附件](./attachments)数组中，并使用 `cid:`（Content-ID）URL 方案引用它们，来在你的 HTML 邮件中嵌入图片。
 
-Here is how to embed an image in three steps:
+以下是嵌入图片的三个步骤：
 
-1. Add the image to the [attachments](./attachments) array in your message options.
-2. Assign a unique [`cid`](./attachments) (Content-ID) value to the attachment.
-3. Reference the image in your HTML using `src="cid:your-cid-value"`.
+1. 将图片添加到消息选项中的[附件](./attachments)数组里。
+2. 给附件分配一个唯一的 [`cid`](./attachments)（Content-ID）值。
+3. 在 HTML 中使用 `src="cid:your-cid-value"` 来引用图片。
 
-:::info Why use embedded images?
-Many email clients block external images by default for privacy and security reasons. Embedded images bypass this restriction because the image data travels inside the message itself, so the recipient sees the image immediately without needing to click "load images."
+:::info 为什么使用嵌入图片？
+许多邮件客户端默认会因为隐私和安全原因屏蔽外部图片。嵌入式图片可以绕过这个限制，因为图片数据是随着邮件内容一起传输的，接收者无需点击“加载图片”就能立即看到图片。
 :::
 
-:::note Choosing a unique cid
-The **cid** value must be unique within the message. A recommended pattern is to use an email-like format with a domain you control, such as `logo@example.com` or `header-image@mycompany.com`. This format helps ensure uniqueness and follows email standards.
+:::note 选择唯一的 cid
+**cid** 值必须在邮件中唯一。推荐的格式是使用你控制的域名的类似邮箱的格式，例如 `logo@example.com` 或 `header-image@mycompany.com`。这种格式有助于确保唯一性，并遵循电子邮件标准。
 :::
 
-#### Basic example
+#### 基本示例
 
-This example shows how to embed a single image from a file path. The `cid` value in the attachment must match the value used in the HTML `src` attribute (without the `cid:` prefix).
+此示例展示了如何从文件路径嵌入一张图片。附件中的 `cid` 值必须与 HTML `src` 属性中使用的值（不含 `cid:` 前缀）匹配。
 
 ```javascript
 const message = {
@@ -34,15 +34,15 @@ const message = {
     {
       filename: "logo.png",
       path: "/path/to/logo.png",
-      cid: "logo@example.com", // matches the cid in the img src attribute
+      cid: "logo@example.com", // 与 img src 属性中的 cid 匹配
     },
   ],
 };
 ```
 
-#### Using a Buffer instead of a file
+#### 使用 Buffer 代替文件
 
-Instead of specifying a file path, you can provide the image data directly as a Buffer. This is useful when the image is generated dynamically or already loaded in memory.
+你也可以不指定文件路径，而是直接提供包含图片数据的 Buffer。当图片是动态生成或已加载到内存中时，这很有用。
 
 ```javascript
 const fs = require("fs");
@@ -55,16 +55,16 @@ const message = {
   attachments: [
     {
       filename: "screenshot.png",
-      content: fs.readFileSync("/tmp/screenshot.png"), // Buffer containing the image data
+      content: fs.readFileSync("/tmp/screenshot.png"), // 包含图片数据的 Buffer
       cid: "screenshot@example.com",
     },
   ],
 };
 ```
 
-#### Embedding multiple images
+#### 嵌入多张图片
 
-You can embed multiple images in the same email. Each image needs its own unique `cid` value, and each must be listed as a separate entry in the `attachments` array.
+你可以在同一封邮件中嵌入多张图片。每张图片都需要自己唯一的 `cid` 值，并且必须作为 `attachments` 数组中的单独条目列出。
 
 ```javascript
 const message = {

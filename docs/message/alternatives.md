@@ -1,36 +1,36 @@
 ---
-title: Alternatives
+title: 替代方案
 sidebar_position: 12
-description: Include alternative representations of content like Markdown in multipart/alternative.
+description: 在 multipart/alternative 中包含内容的替代表示形式，如 Markdown。
 ---
 
-In addition to plain text and HTML, you can include **alternative representations** of your email content. These are different formats of the same message, such as Markdown or a calendar invite. When recipients open your email, their email client automatically selects and displays the best format it supports.
+除了纯文本和 HTML，您还可以包含电子邮件内容的**替代表示形式**。这些是相同消息的不同格式，例如 Markdown 或日历邀请。当收件人打开您的邮件时，邮件客户端会自动选择并显示它支持的最佳格式。
 
-Common use cases for alternatives include:
+替代方案的常见用例包括：
 
-- Calendar event invitations (though see the tip below)
-- Markdown versions of HTML content
-- Other machine-readable formats that some email clients can process
+- 日历事件邀请（但请参见下面的提示）
+- HTML 内容的 Markdown 版本
+- 其他某些邮件客户端可以处理的机器可读格式
 
-:::tip Prefer `icalEvent` for calendar invites
-For calendar events specifically, use the dedicated **`icalEvent`** option instead of alternatives. It provides a simpler API with better compatibility. See [Calendar events](./calendar-events) for details.
+:::tip 推荐使用 `icalEvent` 进行日历邀请
+针对日历事件，建议使用专用的 **`icalEvent`** 选项，而不是替代方案。它提供了更简单的 API 和更好的兼容性。详情请参阅 [日历事件](./calendar-events)。
 :::
 
-## How alternatives differ from attachments
+## 替代方案与附件的区别
 
-Alternative objects use the same fields as [attachment objects](./attachments), including `content`, `path`, `contentType`, `encoding`, and `headers`. The key difference is how they appear in the email structure:
+替代对象使用与[附件对象](./attachments)相同的字段，包括 `content`、`path`、`contentType`、`encoding` 和 `headers`。主要区别在于它们在邮件结构中的呈现方式：
 
-- **Attachments** are separate files that recipients download. They go in `multipart/mixed` or `multipart/related` containers.
-- **Alternatives** are different versions of the email body itself. They go in a `multipart/alternative` container, and the email client picks one to display.
+- **附件** 是收件人下载的单独文件，置于 `multipart/mixed` 或 `multipart/related` 容器中。
+- **替代方案** 是邮件正文的不同版本，置于 `multipart/alternative` 容器中，邮件客户端会选择其中之一进行显示。
 
-| Purpose          | MIME container                           | What recipients see                    |
-| ---------------- | ---------------------------------------- | -------------------------------------- |
-| Attachments      | `multipart/mixed` or `multipart/related` | Downloadable files alongside the email |
-| **Alternatives** | `multipart/alternative`                  | One of several body formats            |
+| 目的           | MIME 容器                             | 收件人所见                           |
+| -------------- | ------------------------------------ | ----------------------------------- |
+| 附件           | `multipart/mixed` 或 `multipart/related` | 可随邮件下载的文件                   |
+| **替代方案**   | `multipart/alternative`              | 多种正文格式中的一种                  |
 
-## Usage
+## 用法
 
-Add an `alternatives` array to your message object. Each alternative needs at minimum a `contentType` and either `content` or `path`:
+向消息对象添加一个 `alternatives` 数组。每个替代方案至少需要 `contentType` 和 `content` 或 `path` 之一：
 
 ```javascript
 const message = {
@@ -47,10 +47,10 @@ const message = {
 };
 ```
 
-In this example, the email includes both an HTML body and a Markdown alternative. Email clients that support Markdown can choose to render it instead of the HTML.
+在此示例中，邮件包含 HTML 正文和 Markdown 替代方案。支持 Markdown 的邮件客户端可以选择渲染它而非 HTML。
 
-### Ordering matters
+### 顺序很重要
 
-You can include as many alternatives as you need. According to the MIME standard (RFC 2046), you should place your preferred format last in the list. Email clients read alternatives from top to bottom and typically display the last format they can understand.
+您可以根据需要包含任意多个替代方案。根据 MIME 标准（RFC 2046），您应将首选格式放在列表最后。邮件客户端从上到下读取替代方案，通常显示它能理解的最后一个格式。
 
-For example, if you include plain text, Markdown, and HTML in that order, most email clients will display the HTML version since it comes last and is widely supported.
+例如，如果您按顺序包含纯文本、Markdown 和 HTML，大多数邮件客户端会显示 HTML 版本，因为它位于最后且广泛支持。

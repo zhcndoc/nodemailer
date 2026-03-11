@@ -1,32 +1,32 @@
 ---
-title: Extra modules
+title: 额外模块
 sidebar_position: 8
-description: Companion libraries for receiving, composing, parsing, and previewing email.
+description: 用于接收、构建、解析和预览电子邮件的辅助库。
 ---
 
-In addition to Nodemailer itself, several companion libraries extend what you can do with email in Node.js. These tools help you receive incoming mail, compose messages programmatically, parse raw email content, and preview emails during development.
+除了 Nodemailer 本身之外，还有几个辅助库扩展了你在 Node.js 中处理电子邮件的能力。这些工具帮助你接收来信，程序化地构建邮件，解析原始邮件内容，以及在开发过程中预览邮件。
 
-## Official companion libraries
+## 官方辅助库
 
-These packages are maintained by the Nodemailer team and designed to work seamlessly with Nodemailer.
+这些包由 Nodemailer 团队维护，设计上与 Nodemailer 无缝协作。
 
-1. [smtp-server](/extras/smtp-server) - Build your own SMTP server to accept incoming email connections. Useful for creating custom mail servers, testing email workflows, or building email-receiving applications.
-2. [smtp-connection](/extras/smtp-connection) - A low-level SMTP client for establishing connections to mail servers. This is the underlying component that powers Nodemailer's [SMTP transport](/smtp/), exposed separately for advanced use cases where you need direct control over the SMTP protocol.
-3. [mailparser](/extras/mailparser) - Parse raw email messages (RFC 822 format) into structured JavaScript objects. The streaming parser efficiently handles large emails and extracts headers, body content, and attachments into an easy-to-use format.
-4. [mailcomposer](/extras/mailcomposer) - Generate RFC 822-compliant email messages from JavaScript objects. This is useful when you need to create a properly formatted [MIME message](/message/) without sending it immediately, such as for storing drafts or passing to another system.
+1. [smtp-server](/extras/smtp-server) - 构建你自己的 SMTP 服务器以接受传入的邮件连接。适用于创建自定义邮件服务器、测试邮件流程或构建邮件接收应用。
+2. [smtp-connection](/extras/smtp-connection) - 一款底层的 SMTP 客户端，用于与邮件服务器建立连接。这是 Nodemailer 的 [SMTP 传输](/smtp/) 的基础组件，单独暴露用于高级用例，即需要直接控制 SMTP 协议时使用。
+3. [mailparser](/extras/mailparser) - 将原始邮件消息（RFC 822 格式）解析为结构化的 JavaScript 对象。流式解析器高效处理大型邮件，提取头部、正文内容和附件，转换为易于使用的格式。
+4. [mailcomposer](/extras/mailcomposer) - 从 JavaScript 对象生成符合 RFC 822 的邮件消息。当你需要创建格式正确的 [MIME 消息](/message/)，但不立即发送时，例如存储草稿或传递给其他系统，该工具非常有用。
 
-## Related projects
+## 相关项目
 
-These are independent open-source projects that complement Nodemailer and may be helpful depending on your use case.
+这些是独立的开源项目，补充 Nodemailer 的功能，根据你的使用场景可能会很有用。
 
-5. [EmailEngine](https://emailengine.app/?utm_source=nodemailer&utm_campaign=nodemailer&utm_medium=module-link) - A self-hosted application that provides a REST API for any IMAP mailbox. It handles email sending via SMTP and delivers real-time updates through webhooks, making it easier to integrate email functionality into your applications.
-6. [ImapFlow](https://imapflow.com/) - A modern, Promise-based IMAP client for Node.js. Originally built for EmailEngine, it works as a standalone library for reading and managing emails from any IMAP server.
-7. [mailauth](https://github.com/andris9/mailauth) - A comprehensive library for email authentication. It validates and generates SPF, DKIM, DMARC, ARC, and BIMI records, helping you verify email authenticity and improve deliverability.
-8. [email-templates](https://github.com/forwardemail/email-templates) - A complete framework for managing email templates. It supports template rendering, preview in browsers and iOS Simulator, and integrates directly with Nodemailer for sending.
-9. [preview-email](https://github.com/forwardemail/preview-email) - A development tool that automatically opens emails in your browser for preview. It works with Nodemailer to help you inspect and debug email content before sending to real recipients.
+5. [EmailEngine](https://emailengine.app/?utm_source=nodemailer&utm_campaign=nodemailer&utm_medium=module-link) - 一个自托管应用，提供针对任意 IMAP 邮箱的 REST API。它通过 SMTP 处理邮件发送，并通过 Webhook 推送实时更新，使得集成电子邮件功能更加容易。
+6. [ImapFlow](https://imapflow.com/) - 一款基于 Promise 的现代 Node.js IMAP 客户端。最初为 EmailEngine 构建，作为独立库用于读取和管理任何 IMAP 服务器的邮件。
+7. [mailauth](https://github.com/andris9/mailauth) - 一款完整的邮件认证库。它验证和生成 SPF、DKIM、DMARC、ARC 和 BIMI 记录，帮助你验证邮件真实性并提升送达率。
+8. [email-templates](https://github.com/forwardemail/email-templates) - 一个完整的邮件模板管理框架。支持模板渲染、浏览器及 iOS 模拟器预览，并直接集成 Nodemailer 进行发送。
+9. [preview-email](https://github.com/forwardemail/preview-email) - 一个开发工具，能自动在浏览器中打开邮件进行预览。它与 Nodemailer 配合使用，帮助你在发送给真实收件人前检查和调试邮件内容。
 
 ---
 
 :::note
-The first four packages (smtp-server, smtp-connection, mailparser, and mailcomposer) are maintained within the Nodemailer GitHub organization and follow the same release cycle as Nodemailer. The remaining projects are maintained by the broader open-source community.
+前四个包（smtp-server、smtp-connection、mailparser 和 mailcomposer）由 Nodemailer GitHub 组织维护，发布周期与 Nodemailer 保持一致。其余项目由更广泛的开源社区维护。
 :::

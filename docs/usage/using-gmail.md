@@ -1,34 +1,34 @@
 ---
-title: Using Gmail
+title: 使用 Gmail
 sidebar_position: 8
-description: Send email through Gmail using OAuth2 or App Passwords with important caveats.
+description: 通过 Gmail 使用 OAuth2 或应用密码发送邮件，并附带重要注意事项。
 ---
 
-> **TL;DR** For new projects, use **OAuth 2.0** (or an App Password if you already have Google 2-Step Verification enabled). Google permanently disabled "Less Secure App" access on **May 30, 2022**.
+> **简要说明** 对于新项目，使用 **OAuth 2.0**（如果已有 Google 双重验证开启，可以使用应用密码）。Google 已于 **2022 年 5 月 30 日** 永久禁用“低安全应用访问”。
 
-Gmail is often the quickest way to send a test email with Nodemailer, but it is _not_ recommended for production workloads. Gmail is designed for individual users, not automated services, and Google's security systems actively monitor for suspicious login activity. When Google detects behavior that resembles account hijacking (for example, your production server connecting from a different country than your usual location), it will block the SMTP connection without delivering the message.
+Gmail 通常是用 Nodemailer 发送测试邮件最快捷的方式，但 _不_建议用于生产环境。Gmail 设计给个人用户而非自动化服务，Google 的安全系统会主动监控可疑登录行为。当 Google 发现类似账号劫持的行为（例如你的生产服务器从与你平常位置不同的国家连接），会阻止 SMTP 连接并阻止邮件发送。
 
-This guide covers the supported authentication methods, Gmail's sending limits, and common issues developers encounter.
+本指南涵盖支持的认证方式、Gmail 的发送限制以及开发者常见问题。
 
 ---
 
-## 1. Choose an authentication method
+## 1. 选择认证方式
 
-| Method                     | When to use                                                                                                       | Status                         |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| **OAuth 2.0**              | Recommended for all new integrations. Works with personal Gmail accounts **and** Google Workspace.                | Supported                      |
-| **App Password**           | Works only when **2-Step Verification** is enabled on the account. Simpler than OAuth 2.0 for small internal tools. | Supported                      |
-| "Less Secure App" Password | A deprecated mechanism that allowed basic authentication logins.                                                  | Disabled since May 30, 2022    |
+| 方式                       | 适用场景                                                                                                         | 状态                           |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **OAuth 2.0**              | 推荐用于所有新集成。兼容个人 Gmail 账户**及**Google Workspace。                                                  | 支持                           |
+| **应用密码**               | 仅在账户启用**双重验证**时可用。相比 OAuth 2.0，适用于小型内部工具更简单。                                         | 支持                           |
+| “低安全应用”密码           | 一种已废弃的机制，支持基本认证登录。                                                                             | 自 2022 年 5 月 30 日起禁用    |
 
-### OAuth 2.0 (recommended)
+### OAuth 2.0（推荐）
 
-OAuth 2.0 is the most secure and reliable method for authenticating with Gmail. Instead of storing passwords, you complete a one-time authorization flow and store a `refreshToken`. Nodemailer then automatically refreshes access tokens as needed.
+OAuth 2.0 是最安全可靠的 Gmail 认证方式。无需存储密码，完成一次授权流程后存储 `refreshToken`，Nodemailer 会根据需要自动刷新访问令牌。
 
 ```js
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail", // Shortcut for Gmail's SMTP settings - see Well-Known Services
+  service: "gmail", // Gmail SMTP 设置的快捷方式 - 详见知名服务（Well-Known Services）
   auth: {
     type: "OAuth2",
     user: "me@gmail.com",
@@ -39,10 +39,10 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-The `service: "gmail"` option is a convenient shortcut that automatically configures Gmail's SMTP server settings. See [Well-Known Services](../smtp/well-known-services) for more details and a full list of supported providers.
+`service: "gmail"` 选项是方便快捷的配置，会自动设置 Gmail 的 SMTP 服务器参数。详见 [知名服务](../smtp/well-known-services) 获取更多信息和完整支持列表。
 
-:::info Google Workspace SMTP Relay
-If you are using **Google Workspace** and need to send from custom addresses without Gmail rewriting the `From:` header, use the dedicated `"GmailWorkspace"` service instead. This connects to `smtp-relay.gmail.com`, which supports sending as any address in your Workspace domain. See Google's [SMTP relay service documentation](https://support.google.com/a/answer/176600) for setup instructions.
+:::info Google Workspace SMTP 中继
+如果你使用 **Google Workspace**，且需要使用自定义地址发送邮件且不被 Gmail 改写 `From:` 头，建议使用专用的 `"GmailWorkspace"` 服务。它连接到 `smtp-relay.gmail.com`，支持以 Workspace 域中的任意地址发送邮件。设置说明请参考 Google 的 [SMTP relay service 文档](https://support.google.com/a/answer/176600)。
 
 ```js
 const transporter = nodemailer.createTransport({
@@ -55,90 +55,90 @@ const transporter = nodemailer.createTransport({
 ```
 :::
 
-For a complete walkthrough on setting up OAuth 2.0 credentials, including how to obtain your client ID, client secret, and refresh token, see the dedicated guide: [SMTP / OAuth 2.0](../smtp/oauth2).
+关于如何设置 OAuth 2.0 凭据（含如何获取 Client ID、Client Secret 和 Refresh Token）的完整教程，请参见专门指南：[SMTP / OAuth 2.0](../smtp/oauth2)。
 
-### App Password (requires 2-Step Verification)
+### 应用密码（需要启用双重验证）
 
-If you have 2-Step Verification enabled on your Google account, you can generate a 16-character App Password specifically for Nodemailer. This password works like a regular SMTP password but is separate from your main Google account password.
+若 Google 账户启用了双重验证，可以为 Nodemailer 生成一个 16 位的应用密码。此密码和一般 SMTP 密码效果相似，但与主账号密码分开。
 
-To create an App Password:
+创建应用密码步骤：
 
-1. Go to your [Google Account Security settings](https://myaccount.google.com/security)
-2. Under "Signing in to Google," select **App Passwords** (you must have 2-Step Verification enabled to see this option)
-3. Generate a new App Password for "Mail"
-4. Copy the 16-character password and use it in your configuration
+1. 访问你的 [Google 账户安全设置](https://myaccount.google.com/security)
+2. 在“登录 Google”部分选择 **应用密码**（必须启用双重验证才能看到该选项）
+3. 为“邮件”生成新的应用密码
+4. 复制这16位密码，配置使用
 
 ```js
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "me@gmail.com",
-    pass: process.env.GOOGLE_APP_PASSWORD, // The 16-character App Password
+    pass: process.env.GOOGLE_APP_PASSWORD, // 你的16位应用密码
   },
 });
 ```
 
-App Passwords bypass most of Google's additional security checks. However, Google may still block connections from unusual locations or suspicious IP address ranges.
+应用密码绕过了 Google 大部分额外的安全检查，但 Google 仍可能阻止来自异常地区或可疑 IP 段的连接。
 
 ---
 
-## 2. Gmail quirks to keep in mind
+## 2. Gmail 注意事项
 
-### Gmail rewrites the From: header
+### Gmail 会重写 From: 头
 
-Gmail _always_ overwrites the sender address with the authenticated account's email address. If you authenticate as `foo@example.com` but specify `bar@example.com` in the `from` field, Gmail will silently replace it with `foo@example.com`.
+Gmail _总是_ 用认证账户的邮箱地址替换发送者地址。如果你以 `foo@example.com` 认证，但 `from` 字段设置了 `bar@example.com`，Gmail 会悄悄将其替换为 `foo@example.com`。
 
-If you need to send from a different address, you have two options:
+如果需要使用不同的发件地址，有两种方式：
 
-- Set up an **alias** in your Gmail settings
-- Configure a **Send As** address in Google Workspace
+- 在 Gmail 设置中添加 **别名**
+- 在 Google Workspace 中配置 **代表发送** 地址
 
-### Daily sending limits
+### 每日发送限制
 
-Gmail enforces strict limits on the number of recipients you can email within a 24-hour period:
+Gmail 对 24 小时内可发送的收件人数严格限制：
 
-- **Personal Gmail accounts:** Up to **500** recipients per rolling 24-hour period
-- **Google Workspace accounts:** Up to **2,000** recipients per rolling 24-hour period
+- **个人 Gmail 账户：** 24 小时内最多 **500** 个收件人
+- **Google Workspace 账户：** 24 小时内最多 **2000** 个收件人
 
-Each recipient counts individually, regardless of how many messages you send. For example, a single email with one To: address and one Cc: address counts as **2 recipients** toward your limit.
+每个收件人都单独计数，不论你发了多少邮件。例如，一封邮件的一个收件人和一个抄送，计作**2个收件人**。
 
-If you exceed these limits, Gmail returns SMTP error **454 4.7.0** ("Too many recipients"). You must wait for the quota to reset before sending more emails.
-
----
-
-## 3. Production alternatives
-
-For reliable email delivery at higher volumes, consider switching to a dedicated email service provider such as SendGrid, Postmark, [Amazon SES](../transports/ses), or Mailgun. These services are designed for automated sending and offer several advantages over Gmail:
-
-- No aggressive login security that blocks legitimate server connections
-- Higher sending limits (many offer free tiers of 100-300 emails per day)
-- No automatic rewriting of sender addresses
-- Better deliverability monitoring and analytics
+超过限制时 Gmail 会返回 SMTP 错误 **454 4.7.0**（“Too many recipients”）。必须等待配额重置后，再继续发送。
 
 ---
 
-## Troubleshooting checklist
+## 3. 生产环境替代方案
 
-If your emails are not being sent, work through these steps:
+若需更高量级可靠投递，建议更换专用邮件服务商，如 SendGrid、Postmark、[Amazon SES](../transports/ses) 或 Mailgun。这些服务针对自动化发送设计，优势包括：
 
-1. **Check Google's security alerts.** Visit the [Google Account "Security > Recent activity" page](https://myaccount.google.com/security) to see if Google blocked a login attempt from your server.
+- 不会用严格登录安全阻止合法服务器连接
+- 更高发送额度（多数免费额度每日 100-300 封邮件）
+- 不自动重写发件人地址
+- 更完善的投递监控与分析功能
 
-2. **Verify your OAuth 2.0 setup.** If using OAuth 2.0, confirm that:
-   - Your `refreshToken` has not expired or been revoked
-   - Your OAuth consent screen is set to "Production" status (not "Testing")
-   - The Google Cloud project has not been deleted or suspended
+---
 
-3. **Confirm your App Password is valid.** If using an App Password:
-   - Verify that 2-Step Verification is still enabled on the account
-   - Check that the App Password has not been revoked
-   - Try generating a new App Password if problems persist
+## 故障排查清单
 
-4. **Synchronize your server clock.** OAuth tokens are time-sensitive. Ensure your server's system clock is accurate (consider using NTP for automatic synchronization).
+邮件发送失败时，请逐项排查：
 
-5. **Test the SMTP connection manually.** Try connecting to Gmail's SMTP server directly to isolate whether the issue is with Nodemailer or the network/authentication:
+1. **查看 Google 安全提醒。** 访问 [Google 账户“安全 > 最近活动”页面](https://myaccount.google.com/security) 确认是否有 Google 阻止你服务器登录尝试。
+
+2. **确认 OAuth 2.0 配置正确。** 使用 OAuth 2.0 时，确保：
+   - `refreshToken` 未过期或未被撤销
+   - OAuth 授权同意屏幕状态为“生产”（而非“测试”）
+   - Google Cloud 项目未被删除或暂停
+
+3. **确认应用密码有效。** 使用应用密码时，检查：
+   - 双重验证仍处于开启状态
+   - 应用密码未被撤销
+   - 若问题持续，可尝试创建新的应用密码
+
+4. **校准服务器时间。** OAuth 令牌对时间敏感，确保服务器系统时钟准确（推荐使用 NTP 自动同步）。
+
+5. **手动测试 SMTP 连接。** 试着直接连接 Gmail SMTP 服务器，确定问题是出在 Nodemailer 还是网络或认证：
 
    ```bash
    openssl s_client -connect smtp.gmail.com:465
    ```
 
-   If this connection fails, the problem is likely with your network configuration or Google blocking your IP address.
+   如果连接失败，很可能是网络配置问题或 Google 阻止了你的 IP 地址。

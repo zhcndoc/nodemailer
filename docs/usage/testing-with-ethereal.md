@@ -1,31 +1,31 @@
 ---
-title: Testing with Ethereal
+title: 使用 Ethereal 进行测试
 sidebar_position: 3
-description: Use Ethereal.email to test email sending without delivering to real recipients.
+description: 使用 Ethereal.email 测试发送邮件而不发送给真实收件人。
 ---
 
-# Testing with Ethereal
+# 使用 Ethereal 进行测试
 
-[Ethereal](https://ethereal.email/) is a free fake SMTP service designed for testing Nodemailer and other email-sending applications. Messages sent to Ethereal are captured and displayed in a web interface, but they are **never delivered** to real recipients. This makes Ethereal perfect for development, testing, and debugging.
+[Ethereal](https://ethereal.email/) 是一个免费的假 SMTP 服务，专为测试 Nodemailer 和其他发送邮件应用设计。发送到 Ethereal 的邮件会被捕获并显示在网页界面中，但**永远不会发送**给真实收件人。这使得 Ethereal 非常适合开发、测试和调试。
 
-## Why use Ethereal?
+## 为什么选择 Ethereal？
 
-- **No real emails sent** - test freely without worrying about accidentally emailing customers or colleagues
-- **Instant preview** - view your emails in a web-based inbox immediately after sending
-- **No configuration hassle** - Nodemailer can generate credentials automatically
-- **Free to use** - no signup required, reasonable rate limits for development
+- **不发送真实邮件**——可以自由测试，无需担心误发给客户或同事
+- **即时预览**——发送后即可在基于网页的收件箱中查看邮件
+- **无需麻烦配置**——Nodemailer 可自动生成凭据
+- **免费使用**——无需注册，开发使用的限速合理
 
-## Automatic test account
+## 自动测试账户
 
-Nodemailer includes built-in support for creating Ethereal test accounts on the fly. Call `nodemailer.createTestAccount()` to generate temporary credentials:
+Nodemailer 内置支持动态创建 Ethereal 测试账户。调用 `nodemailer.createTestAccount()` 即可生成临时凭据：
 
 ```javascript
 const nodemailer = require("nodemailer");
 
-// Create a test account automatically
+// 自动创建测试账户
 const testAccount = await nodemailer.createTestAccount();
 
-// Create a transporter using the test account
+// 使用测试账户创建传输器
 const transporter = nodemailer.createTransport({
   host: testAccount.smtp.host,
   port: testAccount.smtp.port,
@@ -37,65 +37,65 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-The returned `testAccount` object contains:
+返回的 `testAccount` 对象包含：
 
-| Property      | Description                          |
-| ------------- | ------------------------------------ |
-| `user`        | The generated email address          |
-| `pass`        | The password for SMTP authentication |
-| `smtp.host`   | SMTP server hostname                 |
-| `smtp.port`   | SMTP server port                     |
-| `smtp.secure` | Whether to use TLS from the start    |
-| `web`         | URL to the Ethereal web interface    |
+| 属性         | 说明                             |
+| ------------ | ------------------------------- |
+| `user`       | 生成的邮箱地址                   |
+| `pass`       | SMTP 认证密码                   |
+| `smtp.host`  | SMTP 服务器主机名               |
+| `smtp.port`  | SMTP 服务器端口                 |
+| `smtp.secure`| 是否从一开始使用 TLS            |
+| `web`        | Ethereal 网页接口的 URL         |
 
-:::tip Reuse credentials
-Each call to `createTestAccount()` generates a new account. If you want to view all your test emails in one inbox, save the credentials and reuse them across test runs.
+:::tip 复用凭据
+每次调用 `createTestAccount()` 都会生成一个新账户。如果想在一个收件箱查看所有测试邮件，请保存凭据并跨测试运行复用。
 :::
 
-## Preview sent messages
+## 预览已发送邮件
 
-After sending an email through Ethereal, use `nodemailer.getTestMessageUrl(info)` to get a direct link to view the message in your browser:
+通过 Ethereal 发送邮件后，使用 `nodemailer.getTestMessageUrl(info)` 获取直接链接，在浏览器中查看邮件内容：
 
 ```javascript
 const info = await transporter.sendMail({
   from: '"Test Sender" <test@example.com>',
   to: "recipient@example.com",
-  subject: "Test Email",
-  text: "This is a test email sent via Ethereal!",
-  html: "<p>This is a <b>test email</b> sent via Ethereal!</p>",
+  subject: "测试邮件",
+  text: "这是一封通过 Ethereal 发送的测试邮件！",
+  html: "<p>这是一封通过 <b>Ethereal</b> 发送的测试邮件！</p>",
 });
 
-console.log("Message sent: %s", info.messageId);
+console.log("邮件已发送: %s", info.messageId);
 
-// Get the Ethereal URL to preview this email
+// 获取 Ethereal 的预览链接
 const previewUrl = nodemailer.getTestMessageUrl(info);
-console.log("Preview URL: %s", previewUrl);
-// Output: https://ethereal.email/message/...
+console.log("预览链接: %s", previewUrl);
+// 输出示例：https://ethereal.email/message/...
 ```
 
-Open the preview URL in your browser to see exactly how your email looks, including:
+在浏览器打开预览链接，可以查看邮件的完整内容，包括：
 
-- Headers (From, To, Subject, Date, etc.)
-- Plain text and HTML body
-- Attachments
-- Raw message source
+- 头部信息（发件人、收件人、主题、日期等）
+- 纯文本和 HTML 邮件正文
+- 附件
+- 原始邮件源代码
 
-## Complete example
+## 完整示例
 
-Here is a complete example that creates a test account, sends an email, and outputs a preview link:
+下面是一个完整示例，创建测试账户，发送邮件，并输出预览链接：
 
 ```javascript
 const nodemailer = require("nodemailer");
 
 async function sendTestEmail() {
-  // Generate a test account
+  // 创建测试账户
   const testAccount = await nodemailer.createTestAccount();
 
-  console.log("Test account created:");
-  console.log("  User: %s", testAccount.user);
-  console.log("  Pass: %s", testAccount.pass);
+  console.log("测试账户创建成功：");
+  console.log("  用户名: %s", testAccount.user);
+  console.log("  密码: %s", testAccount.pass);
 
-  // Create a transporter
+  // 创建传输器
   const transporter = nodemailer.createTransport({
     host: testAccount.smtp.host,
     port: testAccount.smtp.port,
@@ -106,35 +106,35 @@ async function sendTestEmail() {
     },
   });
 
-  // Send a test message
+  // 发送测试邮件
   const info = await transporter.sendMail({
-    from: `"Test App" <${testAccount.user}>`,
+    from: `"测试应用" <${testAccount.user}>`,
     to: "recipient@example.com",
-    subject: "Hello from Ethereal!",
-    text: "This message was sent using Ethereal.",
-    html: "<p>This message was sent using <b>Ethereal</b>.</p>",
+    subject: "来自 Ethereal 的问候！",
+    text: "这封邮件是通过 Ethereal 发送的。",
+    html: "<p>这封邮件是通过 <b>Ethereal</b> 发送的。</p>",
   });
 
-  console.log("Message sent: %s", info.messageId);
-  console.log("Preview: %s", nodemailer.getTestMessageUrl(info));
+  console.log("邮件已发送: %s", info.messageId);
+  console.log("预览链接: %s", nodemailer.getTestMessageUrl(info));
 }
 
 sendTestEmail().catch(console.error);
 ```
 
-Running this script outputs something like:
+运行该脚本会输出类似内容：
 
 ```
-Test account created:
-  User: abc123@ethereal.email
-  Pass: XyZ789AbCdEf
-Message sent: <abc123@ethereal.email>
-Preview: https://ethereal.email/message/AbCdEfGhIjKl
+测试账户创建成功：
+  用户名: abc123@ethereal.email
+  密码: XyZ789AbCdEf
+邮件已发送: <abc123@ethereal.email>
+预览链接: https://ethereal.email/message/AbCdEfGhIjKl
 ```
 
-## Using the service shortcut
+## 使用服务快捷方式
 
-Instead of using `createTestAccount()`, you can also use the `service: "Ethereal"` shortcut if you have existing Ethereal credentials:
+如果你已有 Ethereal 凭据，也可以跳过 `createTestAccount()`，直接使用 `service: "Ethereal"` 作为快捷方式：
 
 ```javascript
 const transporter = nodemailer.createTransport({
@@ -146,9 +146,9 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-## Integrating with test frameworks
+## 与测试框架集成
 
-Ethereal works well with testing frameworks like Jest or Mocha. Create a test account once in your test setup and reuse it:
+Ethereal 可与 Jest、Mocha 等测试框架很好地结合。可以在测试初始化时创建一次测试账户并复用：
 
 ```javascript
 const nodemailer = require("nodemailer");
@@ -169,29 +169,29 @@ beforeAll(async () => {
   });
 });
 
-test("sends welcome email", async () => {
+test("发送欢迎邮件", async () => {
   const info = await transporter.sendMail({
     from: "app@example.com",
     to: "newuser@example.com",
-    subject: "Welcome!",
-    text: "Thanks for signing up.",
+    subject: "欢迎！",
+    text: "感谢注册。",
   });
 
   expect(info.messageId).toBeDefined();
   expect(info.accepted).toContain("newuser@example.com");
 
-  // Optionally log the preview URL for manual inspection
-  console.log("Preview:", nodemailer.getTestMessageUrl(info));
+  // 可选：打印预览链接以便人工查看
+  console.log("预览链接:", nodemailer.getTestMessageUrl(info));
 });
 ```
 
-## Comparison with other testing options
+## 与其它测试选项比较
 
-| Option | Real delivery | Inbox preview | Setup required |
-| ------ | ------------- | ------------- | -------------- |
-| **Ethereal** | No | Yes | None (auto-generated) |
-| [Mailtrap](https://mailtrap.io/) | No | Yes | Account signup |
-| [Mailhog](https://github.com/mailhog/MailHog) | No | Yes | Local installation |
-| Real SMTP | Yes | N/A | Provider account |
+| 选项           | 是否真实发送 | 收件箱预览   | 需不需要配置   |
+| -------------- | ------------ | ------------ | -------------- |
+| **Ethereal**   | 否           | 是           | 无（自动生成） |
+| [Mailtrap](https://mailtrap.io/) | 否  | 是           | 需要注册       |
+| [Mailhog](https://github.com/mailhog/MailHog) | 否 | 是 | 需本地安装     |
+| 真实 SMTP      | 是           | 不适用       | 需提供商账号   |
 
-Ethereal is ideal for quick development and testing. For team collaboration or CI/CD pipelines, consider Mailtrap or a self-hosted solution like Mailhog.
+Ethereal 非常适合快速开发和测试。若需要团队协作或 CI/CD 流程，推荐使用 Mailtrap 或自托管方案如 Mailhog。

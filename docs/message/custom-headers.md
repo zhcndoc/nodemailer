@@ -1,31 +1,31 @@
 ---
-title: Custom headers
+title: 自定义头部
 sidebar_position: 17
-description: Add or override message headers at message level or for individual attachments.
+description: 在邮件级别或单个附件级别添加或覆盖邮件头。
 ---
 
-Nodemailer automatically generates all required email headers, so you typically do not need to set them manually. However, when you need to add custom headers or override default values, you can use the **`headers`** property. This works both at the message level and for individual [attachments](./attachments) or alternatives.
+Nodemailer 会自动生成所有必需的邮件头，因此通常不需要手动设置它们。但当你需要添加自定义头部或覆盖默认值时，可以使用 **`headers`** 属性。该属性既可以作用于邮件级别，也可以作用于单个[附件](./attachments)或替代内容。
 
-- **`headers`** - an object where each key-value pair becomes an email header.
+- **`headers`** - 一个对象，其中的每个键值对都会变成一条邮件头。
 
-  - Keys are automatically converted to their standard capitalized form (for example, `x-my-key` becomes `X-My-Key`).
-  - Values are automatically encoded for non-ASCII characters using MIME word encoding, and long lines are wrapped to comply with the 78-character line limit. You can disable this automatic processing by using the `prepared` option.
+  - 键会自动转换为标准的大写形式（例如 `x-my-key` 会变成 `X-My-Key`）。
+  - 值会自动使用 MIME 字符编码对非 ASCII 字符编码，且长行会被折行以符合 78 字符的行长限制。你可以通过使用 `prepared` 选项禁用这个自动处理。
 
 :::warning
-Do **not** set protected headers such as `From`, `Sender`, `To`, `Cc`, `Bcc`, `Reply-To`, `In-Reply-To`, `References`, `Subject`, `Message-ID`, or `Date` using the `headers` property. Nodemailer manages these headers internally and will overwrite any values you set. Instead, use the dedicated [message properties](./) (for example, `from`, `to`, `subject`) to set these values.
+不要通过 `headers` 属性设置受保护的邮件头，如 `From`、`Sender`、`To`、`Cc`、`Bcc`、`Reply-To`、`In-Reply-To`、`References`、`Subject`、`Message-ID` 或 `Date`。Nodemailer 会内部管理这些头部，并将覆盖你设置的任何值。请改用专门的[邮件属性](./)（例如 `from`、`to`、`subject`）来设置这些值。
 :::
 
 ---
 
-## Examples
+## 示例
 
-### 1. Add simple custom headers
+### 1. 添加简单的自定义头部
 
-Pass an object with your custom header names as keys and their values as strings. Nodemailer will format the header names correctly and include them in the outgoing email.
+传入一个对象，以自定义的头部名称作为键，头部值作为字符串。Nodemailer 会正确格式化头部名称并将其包含在发送的邮件中。
 
 ```javascript
 const message = {
-  // other fields...
+  // 其他字段...
   headers: {
     "x-my-key": "header value",
     "x-another-key": "another value",
@@ -33,39 +33,39 @@ const message = {
 };
 
 /*
-Results in these headers being added to the email:
+结果会在邮件中添加如下头部：
 X-My-Key: header value
 X-Another-Key: another value
 */
 ```
 
-### 2. Repeat the same header key
+### 2. 重复相同的头部键
 
-Some headers can appear multiple times in an email (such as `Received` or custom tracking headers). To add multiple headers with the same name, provide an array of values instead of a single string.
+某些头部可以在邮件中出现多次（如 `Received` 或自定义跟踪头）。要添加多个同名头部，可以提供一个值数组，而不是单个字符串。
 
 ```javascript
 const message = {
-  // other fields...
+  // 其他字段...
   headers: {
     "x-my-key": ["value for row 1", "value for row 2", "value for row 3"],
   },
 };
 
 /*
-Results in three separate headers with the same name:
+结果会生成三个同名头部：
 X-My-Key: value for row 1
 X-My-Key: value for row 2
 X-My-Key: value for row 3
 */
 ```
 
-### 3. Bypass Nodemailer's encoding and folding
+### 3. 跳过 Nodemailer 的编码和折行处理
 
-By default, Nodemailer encodes non-ASCII characters and wraps long lines to comply with email standards. If you have already encoded the header value yourself or need to include the raw value exactly as-is, set `prepared: true` to prevent any processing.
+默认情况下，Nodemailer 会对非 ASCII 字符进行编码，并对长行折行以符合邮件标准。如果你已经自行编码头部值，或者需要精确使用原始值，可以设置 `prepared: true`，阻止任何处理行为。
 
 ```javascript
 const message = {
-  // other fields...
+  // 其他字段...
   headers: {
     "x-processed": "a really long header or value with non-ascii characters",
     "x-unprocessed": {
@@ -76,18 +76,18 @@ const message = {
 };
 
 /*
-X-Processed: Header value is automatically encoded and wrapped if needed
-X-Unprocessed: Header value is used exactly as provided, with no modifications
+X-Processed: 如果需要，头部值会自动编码和折行
+X-Unprocessed: 头部值将被原样使用，不会被修改
 */
 ```
 
-### 4. Headers on an attachment
+### 4. 在附件上添加头部
 
-You can also add custom headers to individual [attachments](./attachments). This is useful for adding metadata or tracking information to specific files within an email. Simply include a `headers` object inside the attachment definition.
+你也可以为单个[附件](./attachments)添加自定义头部。这对于向邮件中的特定文件添加元数据或跟踪信息非常有用。只需在附件定义中包含 `headers` 对象即可。
 
 ```javascript
 const message = {
-  // other fields...
+  // 其他字段...
   attachments: [
     {
       filename: "report.csv",

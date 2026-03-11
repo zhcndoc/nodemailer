@@ -1,68 +1,58 @@
 ---
 title: DKIM
 sidebar_position: 7
-description: Add cryptographic DKIM signatures to outgoing messages for domain verification.
+description: 为发出的邮件添加加密的 DKIM 签名以验证域名。
 ---
 
-# DKIM Signing
+# DKIM 签名
 
-DomainKeys Identified Mail (DKIM) adds a cryptographic signature to every
-outgoing message. This signature allows receiving mail servers to verify that
-the message genuinely originates from **your** domain and has not been tampered
-with during transit.
+DomainKeys Identified Mail（DKIM）会为每封发出的邮件添加一个加密签名。该签名允许接收邮件服务器验证邮件确实来自**您的**域名，并且在传输过程中未被篡改。
 
-Nodemailer can sign messages with one or more DKIM keys **without** requiring
-any additional dependencies. In most cases, signing is fast and handled entirely
-in memory. For very large messages, you can optionally enable disk caching so
-that only the first _cacheTreshold_ bytes are stored in RAM.
+Nodemailer 可以使用一个或多个 DKIM 密钥为邮件签名，**无需**任何额外依赖。在大多数情况下，签名过程快速且完全在内存中处理。对于非常大的邮件，您可以选择启用磁盘缓存，这样只有前 _cacheTreshold_ 字节数据存储在内存中。
 
 ---
 
-## Configuration
+## 配置
 
-You can configure DKIM signing in two ways:
+您可以用两种方式配置 DKIM 签名：
 
-- **Transport-wide** - Every message sent through the transporter is
-  automatically signed with the same key(s), **or**
-- **Per-message** - Pass a `dkim` object in the [message configuration](../message/) to override or
-  replace the transport-level settings.
+- **全局传输配置** —— 通过传输器发送的每封邮件都会自动用相同的密钥签名，**或者**
+- **单独邮件配置** —— 在[邮件配置](../message/)中传入 `dkim` 对象以覆盖或替代传输级别的设置。
 
-If you specify DKIM settings at both levels, the **message-level settings take
-precedence**.
+如果在两个级别都指定了 DKIM 设置，**邮件级别设置优先**。
 
-### DKIM options
+### DKIM 选项
 
-| Option             | Type                                             | Default            | Description                                                                                                                                                   |
-| ------------------ | ------------------------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `domainName`       | `string` (required)                              | -                  | The domain name to sign for. This appears in the `d=` tag of the DKIM signature header.                                                                       |
-| `keySelector`      | `string` (required)                              | -                  | The DNS selector for your DKIM key. This forms part of the DNS TXT record lookup path: `<selector>._domainkey.<domain>`.                                      |
-| `privateKey`       | `string \| Buffer` (required)                    | -                  | Your PEM-formatted private key. This must correspond to the public key published in your DNS TXT record.                                                      |
-| `keys`             | `Array< {domainName, keySelector, privateKey} >` | -                  | An array of key objects for signing with multiple keys (useful for key rotation or signing for multiple subdomains). When set, the single-key fields above are ignored. |
-| `hashAlgo`         | `'sha256' \| 'sha1'`                             | `'sha256'`         | The hash algorithm used for the body hash. Use `sha256` unless you have a specific reason to use `sha1`.                                                      |
-| `headerFieldNames` | `string`                                         | RFC 4871 defaults  | A colon-separated list of header field names to include in the signature (for example, `from:to:subject`). By default, Nodemailer signs the standard headers recommended by RFC 4871. |
-| `skipFields`       | `string`                                         | -                  | A colon-separated list of header field names to **exclude** from signing. Use this when your email service provider modifies certain headers after signing (for example, `message-id:date`). |
-| `cacheDir`         | `string \| false`                                | `false`            | A directory path for temporary files when processing large messages. Set to `false` to disable disk caching entirely.                                         |
-| `cacheTreshold`    | `number`                                         | `2097152` (2 MB)   | The number of bytes to keep in memory before switching to disk caching. Only applies when `cacheDir` is set to a valid path.                                  |
+| 选项               | 类型                                               | 默认值             | 描述                                                                                                                                                       |
+| ------------------ | ------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `domainName`       | `string`（必填）                                  | -                  | 要签名的域名。此值显示在 DKIM 签名头部的 `d=` 标签中。                                                                                                   |
+| `keySelector`      | `string`（必填）                                  | -                  | 您的 DKIM 密钥的 DNS 选择器。用于 DNS TXT 记录查询路径的一部分：`<selector>._domainkey.<domain>`。                                                       |
+| `privateKey`       | `string \| Buffer`（必填）                        | -                  | 您的 PEM 格式私钥。必须与 DNS TXT 记录中发布的公钥对应。                                                                                                 |
+| `keys`             | `Array< {domainName, keySelector, privateKey} >` | -                  | 用于多密钥签名的密钥对象数组（适用于密钥轮换或为多个子域签名）。设置该项时，上面单密钥的字段会被忽略。                                                  |
+| `hashAlgo`         | `'sha256' \| 'sha1'`                             | `'sha256'`         | 用于正文哈希的哈希算法。除非有特定需求，一般使用 `sha256`。                                                                                            |
+| `headerFieldNames` | `string`                                         | RFC 4871 默认值    | 以冒号分隔的需包含在签名中的邮件头字段列表（例如 `from:to:subject`）。默认情况下，Nodemailer 签名 RFC 4871 推荐的标准邮件头。                           |
+| `skipFields`       | `string`                                         | -                  | 以冒号分隔的需**排除**在签名之外的邮件头字段列表。当您的邮件服务提供商在签名后修改某些头部字段时使用（例如 `message-id:date`）。                       |
+| `cacheDir`         | `string \| false`                                | `false`            | 处理大邮件时用于临时文件的目录路径。设置为 `false` 可完全禁用磁盘缓存。                                                                                |
+| `cacheTreshold`    | `number`                                         | `2097152`（2 MB） | 在切换至磁盘缓存前，内存中保留的字节数。仅当 `cacheDir` 设置为有效路径时生效。                                                                         |
 
 :::warning
-The option `cacheTreshold` is intentionally misspelled (with an "o" instead of "e") to maintain backwards compatibility with older Nodemailer versions.
+选项 `cacheTreshold` 的拼写故意写为“treshold”（带有 "o" 而非 "e"），以保证与旧版本 Nodemailer 的向后兼容性。
 :::
 
 ---
 
-## Usage examples
+## 使用示例
 
-The following examples use CommonJS syntax and require **Node.js v6** or later:
+以下示例使用 CommonJS 语法，需 **Node.js v6** 或更高版本：
 
 ```javascript
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 ```
 
-### 1. Sign every message
+### 1. 对每封邮件签名
 
-This example configures DKIM signing at the transport level, so all messages
-sent through this transporter are automatically signed:
+此示例在传输器级别配置 DKIM 签名，因此通过此传输器发送的所有邮件都会自动被签名：
 
 ```javascript
 const transporter = nodemailer.createTransport({
@@ -77,16 +67,15 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-To verify that your DNS record is correctly configured, run:
+要验证您的 DNS 记录配置是否正确，请运行：
 
 ```bash
 dig TXT 2017._domainkey.example.com
 ```
 
-### 2. Sign with multiple keys
+### 2. 使用多个密钥签名
 
-Use multiple keys when rotating DKIM keys or when sending mail on behalf of
-different subdomains:
+当轮换 DKIM 密钥或代表不同子域发送邮件时，可以使用多个密钥：
 
 ```javascript
 const transporter = nodemailer.createTransport({
@@ -106,22 +95,21 @@ const transporter = nodemailer.createTransport({
         privateKey: fs.readFileSync("./dkim-2016.pem", "utf8"),
       },
     ],
-    cacheDir: false, // disable disk caching
+    cacheDir: false, // 禁用磁盘缓存
   },
 });
 ```
 
-### 3. Sign a specific message only
+### 3. 仅为特定邮件签名
 
-If you do not want to sign all messages, you can configure DKIM on individual
-messages instead:
+如果不希望对所有邮件签名，可以在单独邮件中配置 DKIM：
 
 ```javascript
 const transporter = nodemailer.createTransport({
   host: "smtp.example.com",
   port: 465,
   secure: true,
-  // No DKIM configuration here
+  // 此处无 DKIM 配置
 });
 
 const info = await transporter.sendMail({
@@ -137,11 +125,9 @@ const info = await transporter.sendMail({
 });
 ```
 
-### 4. Cache large messages on disk
+### 4. 对大邮件启用磁盘缓存
 
-When sending messages with large attachments, you can reduce memory usage by
-enabling disk caching. Nodemailer will store message content exceeding the
-threshold in a temporary file:
+发送带大附件的邮件时，可以启用磁盘缓存以减少内存使用。Nodemailer 会将超出阈值的邮件内容存储到临时文件中：
 
 ```javascript
 const transporter = nodemailer.createTransport({
@@ -158,15 +144,12 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-### 5. Skip mutable headers
+### 5. 跳过可变的邮件头
 
-Some email service providers, such as **[Amazon SES](../transports/ses)**, replace headers like
-`Message-ID` and `Date` after you submit the message. If these headers are
-included in the DKIM signature, the signature will fail verification. Use
-`skipFields` to exclude them.
+一些邮件服务商，例如 **[Amazon SES](../transports/ses)**，会在您提交邮件后替换诸如 `Message-ID` 和 `Date` 的邮件头。如果这些头部包含在 DKIM 签名中，则验证会失败。使用 `skipFields` 排除它们。
 
 :::tip
-When using the [SES transport](../transports/ses), Nodemailer automatically adds `date:message-id` to `skipFields` for you.
+使用 [SES 传输器](../transports/ses) 时，Nodemailer 会自动将 `date:message-id` 添加到 `skipFields`。
 :::
 
 ```javascript
@@ -185,16 +168,8 @@ const transporter = nodemailer.createTransport({
 
 ---
 
-## Troubleshooting
+## 故障排查
 
-- **Signature verification fails** - Confirm that your public key is published
-  at `<keySelector>._domainkey.<domainName>` in DNS. Also check that the TXT
-  record is **under 255 characters per string** (some DNS providers split or
-  truncate long records incorrectly).
-- **Header mismatch errors** - If a receiving server reports that signed headers
-  do not match, add the problematic headers to `skipFields` or ensure your
-  sending infrastructure does not modify headers after signing.
-- **Need more help?** Test your DKIM configuration with online tools such as
-  [dkimvalidator.com](https://dkimvalidator.com) or
-  [mail-tester.com](https://www.mail-tester.com). These services send a test
-  email and provide detailed feedback about your DKIM setup.
+- **签名验证失败** —— 确认您的公钥已正确发布于 DNS 的 `<keySelector>._domainkey.<domainName>` 处。还要检查 TXT 记录**每条字符串不超过 255 个字符**（部分 DNS 服务商会错误地拆分或截断过长记录）。
+- **邮件头不匹配错误** —— 如果接收服务器报告签名头部不匹配，可将出错的头部添加到 `skipFields`，或确保发送基础设施在签名后不修改邮件头。
+- **需要更多帮助？** 使用在线工具测试您的 DKIM 配置，例如 [dkimvalidator.com](https://dkimvalidator.com) 或 [mail-tester.com](https://www.mail-tester.com)。这些服务会发送测试邮件并提供您 DKIM 设置的详细反馈。

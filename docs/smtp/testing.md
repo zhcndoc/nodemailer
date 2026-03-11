@@ -1,31 +1,31 @@
 ---
-title: Testing SMTP
+title: 测试 SMTP
 sidebar_position: 22
-description: Test email sending with Ethereal Email mail-catcher service without spamming real inboxes.
+description: 使用 Ethereal Email 邮件捕获服务测试邮件发送，避免真实收件箱收到垃圾邮件。
 ---
 
-When testing email functionality in development or CI environments, you need to avoid accidentally sending messages to real inboxes. Rather than redirecting all emails to a single test address, the recommended approach is to use a _mail-catcher_ service. A mail-catcher accepts messages over SMTP just like a production email provider, but it **never delivers them** to actual recipients. Instead, it stores the messages so you can inspect or download them later.
+在开发或持续集成环境中测试邮件功能时，需要避免意外将邮件发送到真实收件箱。与其将所有邮件重定向到单个测试地址，推荐的做法是使用 _邮件捕获器_ 服务。邮件捕获器像生产邮件服务一样通过 SMTP 接收邮件，但它**从不将邮件投递给实际收件人**。相反，它会存储邮件，方便你之后查看或下载。
 
-For alternative testing approaches, you can also use the [stream transport](../transports/stream) to capture generated messages without any network connection, or run your own local mail server using [smtp-server](../extras/smtp-server).
+作为替代测试方案，你还可以使用 [stream transport](../transports/stream) 来捕获生成的邮件，而无需任何网络连接，或者使用 [smtp-server](../extras/smtp-server) 运行自己的本地邮件服务器。
 
-Nodemailer includes built-in support for [Ethereal Email](https://ethereal.email/), a free mail-catcher service designed specifically for testing. You have two options:
+Nodemailer 内置支持 [Ethereal Email](https://ethereal.email/)，这是一个专为测试设计的免费邮件捕获服务。你有两个选项：
 
-- **Create a temporary account programmatically** using `nodemailer.createTestAccount()`, or
-- **Create a persistent test mailbox** through the Ethereal web dashboard.
+- 使用 `nodemailer.createTestAccount()` **以编程方式创建临时账户**，或
+- 通过 Ethereal 的网页控制台 **创建持久化测试邮箱**。
 
-If you prefer to work completely offline, you can preview messages locally using [forwardemail/email-templates](https://github.com/forwardemail/email-templates), which renders each message in your browser or iOS simulator via [preview-email](https://github.com/forwardemail/preview-email).
+如果你偏好完全离线工作，可以使用 [forwardemail/email-templates](https://github.com/forwardemail/email-templates) 在本地预览邮件，它会通过 [preview-email](https://github.com/forwardemail/preview-email) 在浏览器或 iOS 模拟器中渲染每封邮件。
 
-## Quick-start
+## 快速开始
 
-Install Nodemailer if you have not done so already:
+如果尚未安装 Nodemailer，请先安装：
 
 ```bash
 npm install nodemailer
 ```
 
-### 1. Create a temporary Ethereal account
+### 1. 创建临时 Ethereal 账户
 
-The following example demonstrates how to create a test account, configure a transporter, and send a message:
+以下示例展示了如何创建测试账户、配置传输器并发送邮件：
 
 ```javascript
 // ./mail.js
@@ -33,11 +33,11 @@ const nodemailer = require("nodemailer");
 
 nodemailer.createTestAccount((err, account) => {
   if (err) {
-    console.error("Failed to create a testing account. " + err.message);
+    console.error("创建测试账户失败。 " + err.message);
     return;
   }
 
-  // Create a transporter using the Ethereal test account credentials
+  // 使用 Ethereal 测试账户凭据创建传输器
   const transporter = nodemailer.createTransport({
     host: account.smtp.host,
     port: account.smtp.port,
@@ -48,30 +48,30 @@ nodemailer.createTestAccount((err, account) => {
     },
   });
 
-  // Send a test message
+  // 发送测试邮件
   transporter
     .sendMail({
-      from: "Example App <no-reply@example.com>",
+      from: "示例应用 <no-reply@example.com>",
       to: "user@example.com",
-      subject: "Hello from tests",
-      text: "This message was sent from a Node.js integration test.",
+      subject: "来自测试的问候",
+      text: "这封邮件来自 Node.js 集成测试。",
     })
     .then((info) => {
-      console.log("Message sent: %s", info.messageId);
-      // Get a URL to preview the message in Ethereal's web interface
-      console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+      console.log("邮件已发送: %s", info.messageId);
+      // 获取邮件在 Ethereal 网页界面中的预览链接
+      console.log("预览链接: %s", nodemailer.getTestMessageUrl(info));
     })
     .catch(console.error);
 });
 ```
 
 :::tip
-Ethereal automatically deletes accounts after **48 hours of inactivity**. If you need to inspect messages later, save the generated credentials or create a persistent account through the Ethereal dashboard.
+Ethereal 会在账户 **48 小时未使用** 后自动删除账户。如果你需要后续查看邮件，请保存生成的凭据，或通过 Ethereal 控制台创建持久账户。
 :::
 
-### 2. Switch transports based on environment
+### 2. 根据环境切换传输方式
 
-A common pattern is to centralize your transport configuration in one place. This makes it easy to use Ethereal during development and testing while using a production email service in production. For more details on SMTP configuration options, see the [SMTP transport](./index.md) documentation.
+一个常见模式是在一个地方集中管理传输配置。这样可以在开发和测试时使用 Ethereal，而在生产环境使用真实邮件服务。关于 SMTP 配置选项的更多细节，请参见 [SMTP transport](./index.md) 文档。
 
 ```javascript
 // ./mail-transport.js
@@ -79,7 +79,7 @@ const nodemailer = require("nodemailer");
 
 function createTransport() {
   if (process.env.NODE_ENV === "production") {
-    // Production: send real emails
+    // 生产环境：发送真实邮件
     return nodemailer.createTransport({
       host: "smtp.sendgrid.net",
       port: 587,
@@ -91,7 +91,7 @@ function createTransport() {
     });
   }
 
-  // Development/Testing: capture emails with Ethereal
+  // 开发/测试环境：使用 Ethereal 捕获邮件
   return nodemailer.createTransport({
     host: "smtp.ethereal.email",
     port: 587,
@@ -106,7 +106,7 @@ function createTransport() {
 module.exports = createTransport;
 ```
 
-Your application code can then use the transporter without knowing which service is being used:
+你的应用代码随后即可直接使用传输器，而无需关心所使用的服务：
 
 ```javascript
 const createTransport = require('./mail-transport');
@@ -115,21 +115,21 @@ const transporter = createTransport();
 await transporter.sendMail({...});
 ```
 
-### 3. Inspect the message
+### 3. 查看邮件内容
 
-After `sendMail` completes successfully, the returned `info` object contains everything you need to locate the message in Ethereal:
+`sendMail` 成功完成后，返回的 `info` 对象包含定位 Ethereal 邮件所需的所有信息：
 
 ```javascript
 const info = await transporter.sendMail(message);
 
-console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-// Example output: https://ethereal.email/message/WaQKMgKddxQDoou
+console.log("预览链接: %s", nodemailer.getTestMessageUrl(info));
+// 示例输出: https://ethereal.email/message/WaQKMgKddxQDoou
 ```
 
-You can also browse your messages directly in the Ethereal dashboard by navigating to **Messages** in the web interface.
+你也可以直接在 Ethereal 控制台的 **Messages** 页面浏览邮件。
 
 ---
 
-Below is what a captured message looks like in the Ethereal web interface.
+下面是 Ethereal 网页界面中捕获邮件的示例截图。
 
-![Screenshot of the Ethereal message preview](https://cldup.com/D5Cj_C1Vw3.png)
+![Ethereal 邮件预览截图](https://cldup.com/D5Cj_C1Vw3.png)

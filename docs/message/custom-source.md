@@ -1,24 +1,24 @@
 ---
-title: Custom source
+title: 自定义源
 sidebar_position: 18
-description: Provide your own pre-built RFC 822/EML source instead of letting Nodemailer generate it.
+description: 提供您自己的预构建 RFC 822/EML 源，而不是让 Nodemailer 生成它。
 ---
 
-Sometimes you already have a fully-formatted RFC 822/EML message ready to send. This might happen when a message was composed by another system, retrieved from storage, parsed from an EML file using [MailParser](../extras/mailparser), or generated with [Mailcomposer](../extras/mailcomposer). In these cases, you can pass the pre-built content directly to Nodemailer using the **raw** option, and Nodemailer will send it without modifying the structure.
+有时您已经有一个格式完整的 RFC 822/EML 消息准备发送。这种情况可能出现在消息由其他系统创建、从存储中检索、使用 [MailParser](../extras/mailparser) 从 EML 文件解析，或使用 [Mailcomposer](../extras/mailcomposer) 生成。在这些情况下，您可以使用 **raw** 选项直接将预构建内容传递给 Nodemailer，Nodemailer 将发送它而不修改结构。
 
-The **raw** option can be used at three different levels:
+**raw** 选项可以在三个不同层级使用：
 
-1. **Whole message** - Provide a complete RFC 822 document including all headers and body content.
-2. **Per alternative** - Provide a pre-built MIME part for `text/plain`, `text/html`, or any other alternative content type.
-3. **Per attachment** - Provide a complete attachment including its MIME headers and body.
+1. **整封消息** - 提供包含所有头部和正文内容的完整 RFC 822 文档。
+2. **每个替代内容** - 提供预构建的 MIME 部分，如 `text/plain`、`text/html` 或其他替代内容类型。
+3. **每个附件** - 提供完整的附件，包括其 MIME 头部和正文。
 
-:::tip Always set an envelope
-When you use **raw** for the entire message, you must also provide `envelope.from` and `envelope.to` explicitly. Nodemailer does not parse these values from the raw message content. The envelope tells the [SMTP](../smtp/) server who the sender and recipients are during the mail transfer.
+:::tip 始终设置信封
+当您对整封消息使用 **raw** 时，必须明确提供 `envelope.from` 和 `envelope.to`。Nodemailer 不会从原始消息内容中解析这些值。信封告诉 [SMTP](../smtp/) 服务器在邮件传输过程中的发件人与收件人信息。
 :::
 
-## Examples
+## 示例
 
-### 1. String as the entire message
+### 1. 字符串作为整封消息
 
 ```javascript
 const message = {
@@ -34,11 +34,11 @@ Hello world!`,
 };
 ```
 
-> When using a string, newlines are passed through as-is. If your mail server requires `\r\n` line endings (as per RFC 5321), make sure your raw content uses them.
+> 使用字符串时，换行符会按原样传递。如果您的邮件服务器要求使用 `\r\n` 换行符（如 RFC 5321 所规定），请确保您的 raw 内容使用了它们。
 
-### 2. EML file as the entire message
+### 2. EML 文件作为整封消息
 
-You can read the message content from a file on disk by providing a `path` property instead of a string.
+您可以通过提供 `path` 属性（而非字符串）从磁盘文件中读取消息内容。
 
 ```javascript
 const message = {
@@ -52,11 +52,11 @@ const message = {
 };
 ```
 
-The path can be absolute or relative to the current working directory (`process.cwd()`).
+路径可以是绝对路径，也可以是相对于当前工作目录（`process.cwd()`）的相对路径。
 
-### 3. String as an attachment
+### 3. 字符串作为附件
 
-When using **raw** inside the `attachments` array, you must include all of the MIME headers yourself. Nodemailer does not add `Content-Type`, `Content-Disposition`, or any other headers automatically.
+当在 `attachments` 数组内使用 **raw** 时，您必须自行包含所有 MIME 头部。Nodemailer 不会自动添加 `Content-Type`、`Content-Disposition` 或其他任何头部。
 
 ```javascript
 const message = {

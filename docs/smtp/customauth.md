@@ -1,46 +1,46 @@
 ---
-title: Custom authentication
+title: 自定义认证
 sidebar_position: 25
-description: Extend SMTP transport with custom authentication mechanisms like NTLM or CRAM-MD5.
+description: 使用自定义认证机制（如 NTLM 或 CRAM-MD5）扩展 SMTP 传输。
 ---
 
-Nodemailer's [SMTP transport](./index.md) supports common authentication mechanisms like LOGIN, PLAIN, and [XOAUTH2](./oauth2) out of the box. However, some SMTP servers use proprietary or less common authentication methods that Nodemailer does not recognize. For these cases, you can create custom authentication handlers.
+Nodemailer 的 [SMTP 传输](./index.md) 默认支持常见的认证机制，如 LOGIN、PLAIN 和 [XOAUTH2](./oauth2)。但是，一些 SMTP 服务器使用 Nodemailer 无法识别的专有或不常见的认证方法。针对这些情况，你可以创建自定义认证处理器。
 
-## When do I need a custom handler?
+## 何时需要自定义处理器？
 
-When connecting to an SMTP server, the server advertises which authentication methods it supports. For example, a server might respond with:
+连接到 SMTP 服务器时，服务器会声明它支持哪些认证方法。例如，服务器可能返回：
 
 ```
 250-AUTH LOGIN PLAIN MY-CUSTOM-METHOD
 ```
 
-In this response, the server lists three available authentication methods. Nodemailer already knows how to handle **LOGIN** and **PLAIN**, but it does not recognize **MY-CUSTOM-METHOD**. Without a custom handler, Nodemailer cannot authenticate using this method.
+在这个响应中，服务器列出了三种可用的认证方法。Nodemailer 已经知道如何处理 **LOGIN** 和 **PLAIN**，但无法识别 **MY-CUSTOM-METHOD**。如果没有自定义处理器，Nodemailer 无法使用此方法进行认证。
 
-By providing a handler that matches the method name exactly, you enable Nodemailer to complete the authentication exchange.
+通过提供一个与方法名称完全匹配的处理器，你可让 Nodemailer 完成认证过程。
 
-If a server supports multiple authentication methods, Nodemailer will choose one automatically. To override this behavior and force Nodemailer to use your custom method, set `auth.method` to match your handler's name.
+如果服务器支持多种认证方法，Nodemailer 会自动选择其中一种。若想覆盖此行为并强制 Nodemailer 使用你的自定义方法，请将 `auth.method` 设置为与你的处理器名称相同。
 
 ---
 
-## Defining a handler
+## 定义处理器
 
-To create a custom authentication handler, add a `customAuth` object to your transporter options. Each key in this object is the authentication method name (case-insensitive, but uppercase is conventional), and each value is a function that performs the authentication exchange.
+要创建自定义认证处理器，请在你的 transporter 选项中添加一个 `customAuth` 对象。该对象的每个键是认证方法名称（不区分大小写，但通常使用大写），对应的值是一个执行认证流程的函数。
 
 ```javascript
 const nodemailer = require("nodemailer");
 
-// Define the custom authentication handler
+// 定义自定义认证处理器
 async function myCustomMethod(ctx) {
-  // Build and send the AUTH command with your custom data
-  // This example sends a base64-encoded password (adapt to your server's requirements)
+  // 构造并发送包含自定义数据的 AUTH 命令
+  // 此示例发送 base64 编码的密码（根据你的服务器要求调整）
   const response = await ctx.sendCommand(
     "AUTH MY-CUSTOM-METHOD " + Buffer.from(ctx.auth.credentials.pass).toString("base64")
   );
 
-  // Check if the server accepted the authentication
-  // SMTP success codes are in the 2xx range (typically 235 for successful auth)
+  // 检查服务器是否接受了认证
+  // SMTP 成功状态码为 2xx（通常 235 表示认证成功）
   if (response.status < 200 || response.status >= 300) {
-    throw new Error("Authentication failed: " + response.text);
+    throw new Error("认证失败: " + response.text);
   }
 }
 
@@ -49,8 +49,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    type: "custom",                // tells Nodemailer to use a custom handler
-    method: "MY-CUSTOM-METHOD",    // specifies which handler to use
+    type: "custom",                // 告诉 Nodemailer 使用自定义处理器
+    method: "MY-CUSTOM-METHOD",    // 指定使用哪个处理器
     user: "username",
     pass: "verysecret",
   },
@@ -60,94 +60,94 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-### Handler signature
+### 处理器函数签名
 
 ```ts
 (ctx: HandlerContext) => Promise<void> | void
 ```
 
-Your handler function receives a context object (`ctx`) and can signal completion in two ways:
+你的处理器函数接收一个上下文对象 (`ctx`)，并可以通过两种方式表示完成状态：
 
-1. **Using Promises (recommended)**: Return a Promise that resolves on success or rejects with an error on failure. You can also use an async function, which implicitly returns a Promise.
+1. **使用 Promise（推荐）**：返回一个 Promise，成功时 resolve，失败时 reject。你也可以用 async 函数，其本身返回 Promise。
 
-2. **Using callbacks**: Call `ctx.resolve()` to indicate success, or `ctx.reject(err)` to indicate failure. This approach is useful when working with callback-based code.
+2. **使用回调方式**：调用 `ctx.resolve()` 表示成功，调用 `ctx.reject(err)` 表示失败。适用于回调驱动的代码场景。
 
-### Context object properties
+### 上下文对象属性
 
-The context object (`ctx`) provides everything you need to complete the authentication:
+上下文对象 (`ctx`) 提供了完成认证所需的所有信息：
 
 #### `ctx.auth`
 
-The complete `auth` object you passed to `createTransport()`. This includes any custom properties you added.
+你传入 `createTransport()` 的完整 `auth` 对象，包括你添加的自定义属性。
 
 #### `ctx.auth.credentials`
 
-A convenient alias containing the authentication credentials:
+身份验证凭据的便捷别名：
 
-| Property  | Description                                        |
-| --------- | -------------------------------------------------- |
-| `user`    | The username from `auth.user`                      |
-| `pass`    | The password from `auth.pass`                      |
-| `options` | Any additional options from `auth.options`         |
+| 属性       | 描述                                  |
+| ---------- | ------------------------------------- |
+| `user`     | 来自 `auth.user` 的用户名             |
+| `pass`     | 来自 `auth.pass` 的密码               |
+| `options`  | 来自 `auth.options` 的其他附加选项    |
 
 #### `ctx.method`
 
-The authentication method name being used (the same value as `auth.method`).
+使用的认证方法名（与 `auth.method` 值相同）。
 
 #### `ctx.extensions`
 
-An array of SMTP extensions supported by the server (such as `SIZE`, `STARTTLS`, `PIPELINING`). This can be useful if your authentication method depends on certain server capabilities.
+服务器支持的 SMTP 扩展数组（如 `SIZE`、`STARTTLS`、`PIPELINING`）。若你的认证依赖服务器某些功能，此信息非常有用。
 
 #### `ctx.authMethods`
 
-An array of authentication methods the server advertised (such as `LOGIN`, `PLAIN`, [`XOAUTH2`](./oauth2)). You can check this to verify your expected method is available before attempting authentication.
+服务器声明支持的认证方法数组（如 `LOGIN`、`PLAIN`、[`XOAUTH2`](./oauth2)）。你可以检查期望的方法是否可用。
 
 #### `ctx.maxAllowedSize`
 
-The maximum message size the server accepts (in bytes), or `false` if the server did not advertise a limit.
+服务器接受的最大消息大小（字节为单位），若服务器未声明限制，则为 `false`。
 
 ### `ctx.sendCommand(command)`
 
-Sends a raw SMTP command to the server and returns a Promise that resolves with the server's response. This is your primary tool for implementing the authentication protocol.
+向服务器发送原始 SMTP 命令，返回一个 Promise，resolve 时带服务端响应。这是你实现认证协议的主要手段。
 
-**Response object properties:**
+**响应对象属性：**
 
-| Property   | Example                               | Description                                 |
-| ---------- | ------------------------------------- | ------------------------------------------- |
-| `status`   | `235`                                 | SMTP status code as a number                |
-| `code`     | `2.7.0`                               | Enhanced status code (if provided)          |
-| `text`     | `Authentication successful`           | Human-readable message from the server      |
-| `response` | `235 2.7.0 Authentication successful` | The complete response line from the server  |
-| `command`  | `AUTH MY-CUSTOM-METHOD ...`           | The command that was sent                   |
+| 属性        | 示例                                | 描述                                  |
+| ----------- | --------------------------------- | ------------------------------------- |
+| `status`    | `235`                             | SMTP 状态码（数字类型）               |
+| `code`      | `2.7.0`                           | 增强状态码（如果有）                  |
+| `text`      | `Authentication successful`       | 服务器的人类可读消息                  |
+| `response`  | `235 2.7.0 Authentication successful` | 服务器完整响应行                     |
+| `command`   | `AUTH MY-CUSTOM-METHOD ...`       | 发送的命令                           |
 
-**Callback style:**
+**回调风格：**
 
-If you prefer callbacks over Promises, `sendCommand` also accepts an optional callback:
+若你偏好回调，可以为 `sendCommand` 提供一个可选回调：
 
 ```javascript
 ctx.sendCommand(command, (err, response) => {
   if (err) {
     return ctx.reject(err);
   }
-  // Process response...
+  // 处理响应...
   ctx.resolve();
 });
 ```
 
-### `ctx.resolve()` and `ctx.reject(err)`
+### `ctx.resolve()` 和 `ctx.reject(err)`
 
-These methods signal the outcome of authentication when not using Promises:
+不使用 Promise 时，用这两个方法标示认证结果：
 
-- **`ctx.resolve()`**: Call this when authentication succeeds.
-- **`ctx.reject(err)`**: Call this with an Error object (or error message) when authentication fails.
+- **`ctx.resolve()`**：认证成功时调用。
+- **`ctx.reject(err)`**：认证失败时调用，参数为 Error 对象或错误消息。
 
-When using async functions or returning Promises, you typically do not need these methods directly.
+如果你使用 async 函数或 Promise，一般不需要直接调用它们。
 
 ---
 
-## Passing additional parameters
+## 传递额外参数
 
-If your authentication method requires more than just a username and password, you can include an `options` object in the `auth` configuration. These values become available through `ctx.auth.credentials.options`.
+如果认证方法需要不仅仅是用户名和密码，还可在 `auth` 配置中包含一个 `options` 对象。这些额外参数可通过 `ctx.auth.credentials.options` 访问。
 
 ```javascript
 const transporter = nodemailer.createTransport({
@@ -166,17 +166,17 @@ const transporter = nodemailer.createTransport({
   },
   customAuth: {
     "MY-CUSTOM-METHOD": async (ctx) => {
-      // Access additional parameters through ctx.auth.credentials.options
+      // 通过 ctx.auth.credentials.options 访问额外参数
       const { clientId, applicationId } = ctx.auth.credentials.options;
 
-      // Generate a token using your custom logic
+      // 使用自定义逻辑生成令牌
       const token = await generateSecretToken(clientId, applicationId);
 
-      // Send the authentication command
+      // 发送认证命令
       const response = await ctx.sendCommand("AUTH MY-CUSTOM-METHOD " + token);
 
       if (response.status < 200 || response.status >= 300) {
-        throw new Error("Authentication failed: " + response.text);
+        throw new Error("认证失败: " + response.text);
       }
     },
   },
@@ -185,11 +185,11 @@ const transporter = nodemailer.createTransport({
 
 ---
 
-## Community-provided handlers
+## 社区提供的处理器
 
-The following packages provide ready-to-use handlers for specific authentication methods:
+以下包提供了针对特定认证方法的现成处理器：
 
-| Mechanism | Package                                                                      | Notes                                      |
-| --------- | ---------------------------------------------------------------------------- | ------------------------------------------ |
-| NTLM      | [`nodemailer-ntlm-auth`](https://github.com/nodemailer/nodemailer-ntlm-auth) | Windows integrated authentication (NTLM)  |
-| CRAM-MD5  | [`nodemailer-cram-md5`](https://github.com/nodemailer/nodemailer-cram-md5)   | Challenge-response authentication          |
+| 机制      | 包名                                                                        | 备注                             |
+| --------- | ---------------------------------------------------------------------------- | -------------------------------- |
+| NTLM      | [`nodemailer-ntlm-auth`](https://github.com/nodemailer/nodemailer-ntlm-auth) | Windows 集成认证 (NTLM)          |
+| CRAM-MD5  | [`nodemailer-cram-md5`](https://github.com/nodemailer/nodemailer-cram-md5)   | 挑战-响应认证                   |

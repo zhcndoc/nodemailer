@@ -1,33 +1,33 @@
 ---
-title: Usage
+title: 用法
 sidebar_position: 2
-description: Get started with Nodemailer - installation, creating transporters, and sending messages.
+description: 快速入门 Nodemailer——安装、创建传输器以及发送邮件。
 ---
 
-# Usage
+# 用法
 
-This page shows you how to get Nodemailer up and running quickly. You will learn how to create a **transporter** (the object that sends your emails) and how to send messages through it.
+本页将演示如何快速启动 Nodemailer。您将学习如何创建一个**传输器**（用于发送邮件的对象）以及如何通过它发送邮件。
 
-## Installation
+## 安装
 
-Install Nodemailer from npm:
+通过 npm 安装 Nodemailer：
 
 ```bash
 npm install nodemailer
 ```
 
-## Create a transporter
+## 创建传输器
 
-A **transporter** is an object that handles the connection to your email service and sends messages on your behalf. You create one transporter and reuse it for all your emails.
+**传输器** 是一个处理与邮件服务连接并代表您发送邮件的对象。您只需创建一个传输器，并在所有邮件中重复使用。
 
 ```javascript
 const nodemailer = require("nodemailer");
 
-// Create a transporter using SMTP
+// 使用 SMTP 创建传输器
 const transporter = nodemailer.createTransport({
   host: "smtp.example.com",
   port: 587,
-  secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
+  secure: false, // 使用 STARTTLS（连接后升级到 TLS）
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -35,73 +35,73 @@ const transporter = nodemailer.createTransport({
 });
 ```
 
-The `createTransport(transport[, defaults])` function returns a reusable transporter instance.
+`createTransport(transport[, defaults])` 函数返回一个可复用的传输器实例。
 
-| Parameter     | Type / Description                                                                                                                                                                                    |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **transport** | **Object, String, or Plugin**. Pass a configuration object (as shown above), a connection URL (for example, `"smtp://user:pass@smtp.example.com:587"`), or an already-configured transport plugin. |
-| **defaults**  | _Object (optional)_. Default values that are automatically merged into every message sent through this transporter. Useful for setting a consistent `from` address or custom headers.                 |
+| 参数          | 类型 / 描述                                                                                                                                            |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **transport** | **对象、字符串或插件**。传入配置对象（如上所示）、连接 URL（例如 `"smtp://user:pass@smtp.example.com:587"`）或已配置好的传输插件。                  |
+| **defaults**  | _对象（可选）_。默认值，自动合并到通过此传输器发送的每封邮件中。适用于设置统一的 `from` 地址或自定义头部。                                       |
 
-:::tip Reuse your transporter
-Create the transporter **once** when your application starts and reuse it for all emails. Creating a new transporter for each message wastes resources because each transporter opens network connections and may perform authentication.
+:::tip 复用您的传输器
+在应用启动时**只创建一次**传输器，并在所有邮件中复用。为每封邮件创建新的传输器将浪费资源，因为每个传输器都会打开网络连接并可能进行身份验证。
 :::
 
-### Other transport types
+### 其他传输类型
 
-- **SMTP** - see the [SMTP guide](../smtp/) for the full list of configuration options.
-- **Plugins** - Nodemailer can send emails through any transport that implements the `send(mail, callback)` interface. See the [transport plugin documentation](../transports/) for available options.
+- **SMTP** - 详见 [SMTP 指南](../smtp/) 获取完整配置选项列表。
+- **插件** - Nodemailer 可通过实现了 `send(mail, callback)` 接口的任意传输发送邮件。可参考 [传输插件文档](../transports/) 获取可用选项。
 
-## Verify the connection (optional)
+## 验证连接（可选）
 
-Before sending emails, you can verify that Nodemailer can connect to your SMTP server. This is useful for catching configuration errors early.
+发送邮件前，您可以验证 Nodemailer 是否能连接到您的 SMTP 服务器。这有助于提前捕捉配置错误。
 
 ```javascript
 await transporter.verify();
-console.log("Server is ready to take our messages");
+console.log("服务器已准备好接收邮件");
 ```
 
-## Send a message {#quick-example}
+## 发送邮件 {#quick-example}
 
-Once you have a transporter, send an email by calling `transporter.sendMail(message[, callback])`.
+获得传输器后，调用 `transporter.sendMail(message[, callback])` 发送邮件。
 
 ```javascript
 (async () => {
   try {
     const info = await transporter.sendMail({
-      from: '"Example Team" <team@example.com>', // sender address
-      to: "alice@example.com, bob@example.com", // list of recipients
-      subject: "Hello", // subject line
-      text: "Hello world?", // plain text body
-      html: "<b>Hello world?</b>", // HTML body
+      from: '"Example Team" <team@example.com>', // 发件人地址
+      to: "alice@example.com, bob@example.com", // 收件人列表
+      subject: "Hello", // 邮件主题
+      text: "Hello world?", // 纯文本正文
+      html: "<b>Hello world?</b>", // HTML 正文
     });
 
-    console.log("Message sent: %s", info.messageId);
-    // Preview URL is only available when using an Ethereal test account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    console.log("邮件已发送: %s", info.messageId);
+    // 预览 URL 仅在使用 Ethereal 测试账户时可用
+    console.log("预览 URL: %s", nodemailer.getTestMessageUrl(info));
   } catch (err) {
-    console.error("Error while sending mail", err);
+    console.error("发送邮件时出错", err);
   }
 })();
 ```
 
-### Parameters
+### 参数
 
-| Parameter    | Description                                                                                              |
-| ------------ | -------------------------------------------------------------------------------------------------------- |
-| **message**  | An object containing the email content and headers. See [Message configuration](../message/) for details. |
-| **callback** | _(optional)_ A function with signature `(err, info) => {}`. If omitted, `sendMail` returns a Promise.    |
+| 参数         | 描述                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------- |
+| **message**  | 包含邮件内容和头部的对象。详情请见 [邮件配置](../message/)。                                       |
+| **callback** | _(可选)_ 签名为 `(err, info) => {}` 的函数。如果省略，`sendMail` 返回一个 Promise。                  |
 
-The `info` object returned by most transports contains:
+大多数传输返回的 `info` 对象包含：
 
-| Property    | Description                                                               |
-| ----------- | ------------------------------------------------------------------------- |
-| `messageId` | The **Message-ID** header value assigned to the email.                    |
-| `envelope`  | An object containing the [SMTP envelope](../smtp/envelope) addresses (`from` and `to`). |
-| `accepted`  | An array of recipient addresses that the server accepted.                 |
-| `rejected`  | An array of recipient addresses that the server rejected.                 |
-| `pending`   | With the _direct_ transport: addresses that received a temporary failure. |
-| `response`  | The final response string received from the SMTP server.                  |
+| 属性         | 描述                                                     |
+| ------------ | -------------------------------------------------------- |
+| `messageId`  | 邮件的 **Message-ID** 头部值。                          |
+| `envelope`   | 一个对象，包含 [SMTP 信封](../smtp/envelope) 地址（`from` 和 `to`）。 |
+| `accepted`   | 服务器接受的收件人地址数组。                              |
+| `rejected`   | 服务器拒绝的收件人地址数组。                              |
+| `pending`    | 对于 _direct_ 传输：收到临时错误的地址。                 |
+| `response`   | 从 SMTP 服务器接收到的最终响应字符串。                    |
 
-:::info Partial success
-When a message has multiple recipients, it is considered **sent** as long as **at least one** recipient address was accepted by the server. Check the `rejected` array to see which addresses failed.
+:::info 部分成功
+当邮件有多个收件人时，只要**至少一个**收件人地址被服务器接受，该邮件即被视为**已发送**。请检查 `rejected` 数组以查看被拒收的地址。
 :::
