@@ -45,8 +45,8 @@ const transporter = nodemailer.createTransport({
 await transporter.sendMail({
   from: "sender@example.com",
   to: "recipient@example.com",
-  subject: "Message",
-  text: "I hope this message gets read!",
+  subject: "消息",
+  text: "希望这封邮件能被阅读！",
   dsn: {
     id: "msg-123",
     return: "headers",
@@ -64,8 +64,8 @@ await transporter.sendMail({
 await transporter.sendMail({
   from: "sender@example.com",
   to: "recipient@example.com",
-  subject: "Message",
-  text: "I hope this message gets read!",
+  subject: "消息",
+  text: "希望这封邮件能被阅读！",
   dsn: {
     id: "msg-124",
     return: "headers",

@@ -216,8 +216,8 @@ let transporter = nodemailer.createTransport({
 transporter.sendMail({
   from: "sender@example.com",
   to: "recipient@example.com",
-  subject: "Message",
-  text: "I hope this message gets through!",
+  subject: "消息",
+  text: "希望这封邮件能成功送达！",
   auth: {
     user: "user@example.com",
     refreshToken: "1/XXxXxsss-xxxXXXXXxXxx0XXXxxXXx0x00xxx",

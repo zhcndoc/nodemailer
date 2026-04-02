@@ -2,10 +2,10 @@ const lightCodeTheme = require("prism-react-renderer").themes.github;
 const darkCodeTheme = require("prism-react-renderer").themes.dracula;
 
 export default {
-  title: "Nodemailer",
-  tagline: "✉️ Send e-mails with Node.JS – easy as cake!",
+  title: "Nodemailer 中文文档",
+  tagline: "✉️ 使用 Node.js 发送电子邮件——轻松如蛋糕！",
   favicon: "img/favicon.ico",
-  url: "https://nodemailer.com",
+  url: "https://nodemailer.zhcndoc.com",
   baseUrl: "/",
 
   // GitHub pages deployment config.
@@ -29,8 +29,8 @@ export default {
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: "en",
-    locales: ["en"],
+    defaultLocale: "zh-CN",
+    locales: ["zh-CN"],
   },
 
   presets: [
@@ -59,9 +59,13 @@ export default {
   ],
 
   scripts: [
+    // {
+    //   src: "https://plausible.emailengine.dev/js/script.js",
+    //   defer: true,
+    // },
     {
-      src: "https://plausible.emailengine.dev/js/script.js",
-      defer: true,
+      src: 'https://www.zhcndoc.com/js/common.js',
+      async: true,
     },
   ],
 
@@ -79,12 +83,17 @@ export default {
           type: "docSidebar",
           sidebarId: "docs",
           position: "left",
-          label: "Documentation",
+          label: "文档",
         },
         {
           href: "https://emailengine.app/?utm_source=nodemailer&utm_campaign=nodemailer&utm_medium=navbar",
           position: "left",
           label: "EmailEngine",
+        },
+        {
+          href: "https://www.zhcndoc.com",
+          position: "left",
+          label: "简中文档",
         },
         {
           href: "https://www.npmjs.com/package/nodemailer",
@@ -101,7 +110,7 @@ export default {
     footer: {
       style: "dark",
 
-      copyright: `Copyright © 2010 - ${new Date().getFullYear()} Andris Reinman. Powered by <a href="https://emailengine.app/?utm_source=nodemailer&utm_campaign=nodemailer&utm_medium=footer" class="footer__link-item">EmailEngine</a>.`,
+      copyright: `<a target="_blank" style="text-decoration: none;" href="https://www.zhcndoc.com">简中文档</a>｜<a rel="nofollow" target="_blank" style="text-decoration: none;" href="https://beian.miit.gov.cn">沪ICP备2024070610号-3</a>`,
     },
     prism: {
       theme: lightCodeTheme,

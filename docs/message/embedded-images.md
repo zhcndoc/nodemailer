@@ -28,8 +28,8 @@ description: 使用 Content-ID (cid:) URL 方案直接将图片嵌入 HTML 正�
 const message = {
   from: "Alice <alice@example.com>",
   to: "Bob <bob@example.com>",
-  subject: "Inline image test",
-  html: 'Embedded image: <img src="cid:logo@example.com" alt="Company logo"/>',
+  subject: "内联图片测试",
+  html: '嵌入式图片：<img src="cid:logo@example.com" alt="公司 Logo"/>',
   attachments: [
     {
       filename: "logo.png",
@@ -50,8 +50,8 @@ const fs = require("fs");
 const message = {
   from: "Alice <alice@example.com>",
   to: "Bob <bob@example.com>",
-  subject: "Screenshot attached",
-  html: '<img src="cid:screenshot@example.com" alt="Screenshot"/>',
+  subject: "已附截图",
+  html: '<img src="cid:screenshot@example.com" alt="截图"/>',
   attachments: [
     {
       filename: "screenshot.png",
@@ -70,12 +70,12 @@ const message = {
 const message = {
   from: "Reports <reports@example.com>",
   to: "Team <team@example.com>",
-  subject: "Monthly report",
+  subject: "月度报告",
   html: `
-    <h1>Monthly Report</h1>
-    <p>Here are this month's results:</p>
-    <img src="cid:chart@example.com" alt="Sales chart"/>
-    <img src="cid:badge@example.com" alt="Achievement badge"/>
+    <h1>月度报告</h1>
+    <p>以下是本月的结果：</p>
+    <img src="cid:chart@example.com" alt="销售图表"/>
+    <img src="cid:badge@example.com" alt="成就徽章"/>
   `,
   attachments: [
     { filename: "chart.png", path: "./chart.png", cid: "chart@example.com" },

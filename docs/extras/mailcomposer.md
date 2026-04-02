@@ -125,10 +125,10 @@ const mailOptions = {
   // ...其他字段...
   attachments: [
     // 文本字符串作为附件内容
-    { filename: "hello.txt", content: "hello world!" },
+    { filename: "hello.txt", content: "你好，世界！" },
 
     // 二进制 Buffer 作为附件内容
-    { filename: "buffer.txt", content: Buffer.from("hello world!", "utf-8") },
+    { filename: "buffer.txt", content: Buffer.from("你好，世界！", "utf-8") },
 
     // 从磁盘文件流读取内容
     { filename: "file.txt", path: "/path/to/file.txt" },
@@ -140,7 +140,7 @@ const mailOptions = {
     { filename: "stream.txt", content: fs.createReadStream("file.txt") },
 
     // 显式设置内容类型
-    { filename: "data.bin", content: "hello world!", contentType: "application/octet-stream" },
+    { filename: "data.bin", content: "你好，世界！", contentType: "application/octet-stream" },
 
     // 从远程 URL 获取附件内容
     { filename: "license.txt", path: "https://raw.githubusercontent.com/nodemailer/nodemailer/master/LICENSE" },
@@ -164,11 +164,11 @@ const mailOptions = {
 
 ```js
 const mailOptions = {
-  html: "<b>Hello world!</b>",
+  html: "<b>你好，世界！</b>",
   alternatives: [
     {
       contentType: "text/x-web-markdown",
-      content: "**Hello world!**",
+      content: "**你好，世界！**",
     },
   ],
 };

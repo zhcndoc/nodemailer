@@ -1,5 +1,5 @@
 ---
-title: Nodemailer
+title: Nodemailer 介绍
 sidebar_position: 1
 description: 使用 Node.JS 发送电子邮件 —— 简单如蛋糕，无需运行时依赖。
 ---
@@ -71,9 +71,9 @@ const transporter = nodemailer.createTransport({
   const info = await transporter.sendMail({
     from: '"Maddison Foo Koch" <maddison53@ethereal.email>',
     to: "bar@example.com, baz@example.com",
-    subject: "Hello ✔",
-    text: "Hello world?", // 邮件纯文本版本
-    html: "<b>Hello world?</b>", // 邮件 HTML 版本
+    subject: "你好 ✔",
+    text: "你好，世界？", // 邮件纯文本版本
+    html: "<b>你好，世界？</b>", // 邮件 HTML 版本
   });
 
   console.log("邮件已发送:", info.messageId);

@@ -132,8 +132,8 @@ async function sendEmail() {
       "recipient@example.com",                              // 纯地址
       { name: "Nodemailer User", address: "user@example.com" }  // 地址对象
     ],
-    subject: "Hello from Nodemailer",
-    text: "This demonstrates the different address formats."
+    subject: "来自 Nodemailer 的问候",
+    text: "这演示了不同的地址格式。"
   });
 }
 

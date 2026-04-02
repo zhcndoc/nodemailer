@@ -40,14 +40,14 @@ attachments: [
   // 从字符串创建附件的最简单方式
   {
     filename: "hello.txt",
-    content: "Hello world!",
+    content: "你好，世界！",
   },
 
   // 2. 缓冲区内容
   // 当内存中已有二进制数据时使用
   {
     filename: "buffer.txt",
-    content: Buffer.from("Hello world!", "utf8"),
+    content: Buffer.from("你好，世界！", "utf8"),
   },
 
   // 3. 文件系统中的文件
@@ -107,7 +107,7 @@ attachments: [
       "Content-Type: text/plain; charset=utf-8",
       'Content-Disposition: attachment; filename="greeting.txt"',
       "",
-      "Hello world!"
+      "你好，世界！"
     ].join("\r\n"),
   },
 ];

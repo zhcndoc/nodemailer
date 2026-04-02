@@ -37,11 +37,11 @@ const message = {
   from: "sender@example.com",
   to: "recipient@example.com",
   subject: "Hello",
-  html: "<b>Hello world!</b>",
+  html: "<b>你好，世界！</b>",
   alternatives: [
     {
       contentType: "text/x-web-markdown",
-      content: "**Hello world!**",
+      content: "**你好，世界！**",
     },
   ],
 };

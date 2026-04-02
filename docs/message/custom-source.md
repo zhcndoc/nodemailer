@@ -28,9 +28,9 @@ const message = {
   },
   raw: `From: sender@example.com
 To: recipient@example.com
-Subject: Hello world
+Subject: 你好，世界
 
-Hello world!`,
+你好，世界！`,
 };
 ```
 
@@ -62,13 +62,13 @@ const message = {
 const message = {
   from: "sender@example.com",
   to: "recipient@example.com",
-  subject: "Custom attachment",
+  subject: "自定义附件",
   attachments: [
     {
       raw: `Content-Type: text/plain
 Content-Disposition: attachment; filename="notes.txt"
 
-Attached text file`,
+附加文本文件`,
     },
   ],
 };

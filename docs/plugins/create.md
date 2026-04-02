@@ -198,8 +198,8 @@ transporter.sendMail(
   {
     from: "sender@example.com",
     to: "receiver@example.com",
-    subject: "Hello",
-    text: "Hello world!",
+    subject: "你好",
+    text: "你好，世界！",
   },
   console.log
 );

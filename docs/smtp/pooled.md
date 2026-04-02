@@ -43,7 +43,7 @@ await transporter.sendMail({
   from: "新闻通讯 <noreply@example.com>",
   to: "alice@example.com",
   subject: "你好，连接池世界",
-  text: "Hi Alice!",
+  text: "嗨，Alice！",
 });
 ```
 

@@ -470,8 +470,8 @@ const message = {
 const message = {
   from: "sender@example.com",
   to: "recipient@example.com",
-  subject: "Secure message",
-  text: "This requires TLS throughout delivery",
+  subject: "安全消息",
+  text: "此消息在整个传输过程中都需要 TLS",
   requireTLSExtensionEnabled: true, // 服务器支持时启用
 };
 ```

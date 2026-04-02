@@ -48,7 +48,7 @@ async function sendListMessage() {
   await transporter.sendMail({
     from: "sender@example.com",
     to: "recipient@example.com",
-    subject: "List Message",
+    subject: "列表邮件",
     text: "我希望没人会退订这个列表！",
     list: {
       // List-Help: <mailto:admin@example.com?subject=help>

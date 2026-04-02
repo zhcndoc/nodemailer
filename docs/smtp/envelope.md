@@ -65,7 +65,7 @@ async function main() {
       ],
     },
     subject: "Custom SMTP envelope",
-    text: "Hello!",
+    text: "你好！",
   });
 
   console.log("Envelope used:", info.envelope);

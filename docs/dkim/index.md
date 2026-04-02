@@ -115,8 +115,8 @@ const transporter = nodemailer.createTransport({
 const info = await transporter.sendMail({
   from: "sender@example.com",
   to: "recipient@example.com",
-  subject: "Hello with DKIM",
-  text: "I hope this message gets read!",
+  subject: "带 DKIM 的问候",
+  text: "希望这封邮件能被阅读！",
   dkim: {
     domainName: "example.com",
     keySelector: "2017",

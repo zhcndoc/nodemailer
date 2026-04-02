@@ -68,8 +68,8 @@ transporter.sendMail(
   {
     from: "sender@example.com",
     to: "recipient@example.com",
-    subject: "Streamed message",
-    text: "This message is streamed using CRLF line endings.",
+    subject: "流式消息",
+    text: "此消息使用 CRLF 换行符进行流式传输。",
   },
   (err, info) => {
     if (err) throw err;
@@ -98,8 +98,8 @@ transporter.sendMail(
   {
     from: "sender@example.com",
     to: "recipient@example.com",
-    subject: "Buffered message",
-    text: "This message is buffered using LF line endings.",
+    subject: "缓存消息",
+    text: "此消息使用 LF 换行符缓存。",
   },
   (err, info) => {
     if (err) throw err;
@@ -128,8 +128,8 @@ transporter.sendMail(
   {
     from: "sender@example.com",
     to: "recipient@example.com",
-    subject: "JSON message",
-    text: "I hope this message gets JSON-ified!",
+    subject: "JSON 消息",
+    text: "希望这封邮件能被转换成 JSON！",
   },
   (err, info) => {
     if (err) throw err;
@@ -146,8 +146,8 @@ transporter.sendMail(
 {
   "from": { "address": "sender@example.com", "name": "" },
   "to": [{ "address": "recipient@example.com", "name": "" }],
-  "subject": "JSON message",
-  "text": "I hope this message gets JSON-ified!",
+  "subject": "JSON 消息",
+  "text": "希望这封邮件能被转换成 JSON！",
   "headers": {},
   "messageId": "<77a3458f-8070-339d-095f-85bb73f3db8e@example.com>"
 }

@@ -25,9 +25,9 @@ description: 配置电子邮件消息字段，包括发件人、收件人、主�
 const message = {
   from: "sender@server.com",
   to: "receiver@example.com",
-  subject: "Hello World",
-  text: "This is the plaintext version of the email.",
-  html: "<p>This is the <strong>HTML version</strong> of the email.</p>",
+  subject: "你好，世界",
+  text: "这是邮件的纯文本版本。",
+  html: "<p>这是邮件的 <strong>HTML 版本</strong>。</p>",
 };
 ```
 
@@ -124,9 +124,9 @@ AMP4EMAIL 让你打造交互式、动态邮件。以下示例展示如何在标�
 const message = {
   from: "Nodemailer <example@nodemailer.com>",
   to: "Nodemailer <example@nodemailer.com>",
-  subject: "AMP4EMAIL message",
-  text: "For clients with plaintext support only",
-  html: "<p>For clients that do not support AMP4EMAIL or when AMP content is invalid</p>",
+  subject: "AMP4EMAIL 消息",
+  text: "仅适用于支持纯文本的客户端",
+  html: "<p>适用于不支持 AMP4EMAIL 或 AMP 内容无效的客户端</p>",
   amp: `<!doctype html>
     <html ⚡4email>
       <head>

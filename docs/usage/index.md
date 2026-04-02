@@ -70,9 +70,9 @@ console.log("服务器已准备好接收邮件");
     const info = await transporter.sendMail({
       from: '"Example Team" <team@example.com>', // 发件人地址
       to: "alice@example.com, bob@example.com", // 收件人列表
-      subject: "Hello", // 邮件主题
-      text: "Hello world?", // 纯文本正文
-      html: "<b>Hello world?</b>", // HTML 正文
+      subject: "你好", // 邮件主题
+      text: "你好，世界？", // 纯文本正文
+      html: "<b>你好，世界？</b>", // HTML 正文
     });
 
     console.log("邮件已发送: %s", info.messageId);
