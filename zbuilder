@@ -1,0 +1,17 @@
+FROM --platform=$BUILDPLATFORM node:24-bookworm AS builder
+
+WORKDIR /app
+
+ENV CI=true
+
+COPY . .
+
+RUN npm ci
+
+RUN npm run build
+
+FROM ikxin/caddy:latest
+
+COPY --from=builder /app/build /usr/share/caddy
+
+EXPOSE 8080
